@@ -76,6 +76,9 @@ Following sections summarize the important notes taken during the framework deve
 
 ### Part 2 - Implement Page Object Model (POM) design
 
+<img src="doc/framework-structure.png" width="1200">
+
+* Page Classes are added and extended from the BaseTest to reuse the methods and specify locators inside page classes.
 
 ### Part 3 - Alternate Design | Abstract Test Data & Static Text | Exception Handling
 
