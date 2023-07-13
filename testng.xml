@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="Suite" parallel="false">
+    <listeners>
+        <listener class-name="com.itkhanz.listeners.TestListener" />
+    </listeners>
     <test name="Pixel_5">
         <parameter name="platformName" value="Android" />
         <parameter name="platformVersion" value="13.0" />
         <parameter name="deviceName" value="Pixel_5" />
         <parameter name="udid" value="emulator-5554" />
         <classes>
-            <class name="com.itkhanz.tests.LoginTest"/>
+            <class name="com.itkhanz.tests.LoginTest">
+                <methods>
+                    <include name="invalidUsernameTest"/>
+                </methods>
+            </class>
         </classes>
     </test> <!-- Test -->
 </suite> <!-- Suite -->

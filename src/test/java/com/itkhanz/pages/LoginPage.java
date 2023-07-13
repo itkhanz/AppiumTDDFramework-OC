@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 public class LoginPage extends BaseTest {
 
     //TODO initialize the driver from driver factory in test case, and pass it to login page which extends from base page and pass the driver to base page in constructor
-    @AndroidFindBy(accessibility = "test-Username")
+    @AndroidFindBy(accessibility = "test-Username1")
     private WebElement usernameTxtFld;
 
     @AndroidFindBy (accessibility = "test-Password")
