@@ -3,7 +3,10 @@ package com.itkhanz;
 import com.itkhanz.constants.Constants;
 import com.itkhanz.utils.XMLUtils;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -25,7 +28,8 @@ public class BaseTest {
     //TODO move driver initialization to properties utils
     protected static AppiumDriver driver;
     protected static Properties props;
-    protected static HashMap<String, String> stringsMap = new HashMap<String, String>();
+    protected static HashMap<String, String> stringsMap = new HashMap<>();
+    protected static String platform;
     InputStream configStream;
     InputStream stringsStream;
 
@@ -33,9 +37,9 @@ public class BaseTest {
         PageFactory.initElements(new AppiumFieldDecorator(driver),this);
     }
 
-    @Parameters({"platformName", "platformVersion", "deviceName", "udid"})
+    @Parameters({"platformName", "deviceName", "udid"})
     @BeforeTest
-    public void setup(String platformName, String platformVersion, String deviceName, String udid) throws Exception{
+    public void setup(String platformName, String deviceName, String udid) throws Exception{
         try {
             String xmlFileName = "strings/strings.xml";
             stringsStream = getClass().getClassLoader().getResourceAsStream(xmlFileName);
@@ -46,24 +50,42 @@ public class BaseTest {
             configStream = getClass().getClassLoader().getResourceAsStream(propFileName);
             props.load(configStream);
 
-            String appURL = Objects.requireNonNull(getClass().getResource(props.getProperty("androidAppLocation"))).getFile();
-
-            UiAutomator2Options options = new UiAutomator2Options()
-                    .setAutomationName("UIAutomator2")
-                    .setPlatformName(platformName)
-                    .setPlatformVersion(platformVersion)
-                    .setDeviceName(deviceName)   //AvdId (not needed with udid)
-                    .setUdid(udid) //not needed when device name and platform version are enough to locate the emulator running
-                    .setAppPackage(props.getProperty("androidAppPackage"))
-                    .setAppActivity(props.getProperty("androidAppActivity"))
-                    //.setApp(appURL) //not needed when app is pre-installed
-                    //.setAppWaitActivity(props.getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
-                    //.setAvd("pixel_5")  //hw device name of emulator
-                    ;
-
             try {
+                platform = platformName; //we declared platform as protected class variable because we need this info in test cases
                 URL url = new URL(props.getProperty("appiumURL"));
-                driver = new AppiumDriver(url, options);
+                switch (platformName) {
+                    case "Android" -> {
+                        //get the complete path of the app on local machine (it will append the root path with the property)
+                        String appURL = Objects.requireNonNull(getClass().getResource(props.getProperty("androidAppLocation"))).getFile();
+                        UiAutomator2Options options = new UiAutomator2Options()
+                                .setAutomationName(props.getProperty("androidAutomationName"))
+                                .setPlatformName(platformName)
+                                .setDeviceName(deviceName)   //AvdId (not needed with udid)
+                                .setUdid(udid) //UDID is preferred over platform version and platform name to uniquely identify device
+                                .setAppPackage(props.getProperty("androidAppPackage"))
+                                .setAppActivity(props.getProperty("androidAppActivity"))
+                                //.setApp(appURL) //not needed when app is pre-installed
+                                .setAppWaitActivity(props.getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
+                                //.setAvd(deviceName)  //hw device name of emulator e.g. Pixel_5, it automatically opens up the emulator
+                                ;
+                        driver = new AndroidDriver(url, options);
+                    }
+                    case "iOS" -> {
+                        //get the complete path of the app on local machine (it will append the root path with the property)
+                        String appURL = Objects.requireNonNull(getClass().getResource(props.getProperty("iOSAppLocation"))).getFile();
+                        XCUITestOptions options = new XCUITestOptions()
+                                .setAutomationName(props.getProperty("iOSAutomationName"))
+                                .setPlatformName(platformName)
+                                .setDeviceName(deviceName)   // not needed with udid
+                                .setUdid(udid) //not needed when device name and platform version are enough to locate the emulator running
+                                .setBundleId(props.getProperty("iOSBundleId")) //not needed with appUrl
+                                //.setApp(appURL) //not needed when app is pre-installed
+                                .setUsePrebuiltWda(true)    //speeds up the test execution if WDA is already on the device
+                                ;
+                        driver = new IOSDriver(url, options);
+                    }
+                    default -> throw new RuntimeException("Inavlid platform! - " + platformName);
+                }
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 throw  new RuntimeException("Failed to initialize URL for Appium Session: " + "http://127.0.0.1:4723");
@@ -71,7 +93,6 @@ public class BaseTest {
 
             String sessionID = driver.getSessionId().toString();
             System.out.println("Appium Driver is initialized with session id: " + sessionID);
-            //driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,5 +139,14 @@ public class BaseTest {
     public String getAttribute(WebElement element, String attribute) {
         waitForVisibility(element);
         return element.getAttribute(attribute);
+    }
+
+    public String getLabelText(WebElement e) {
+        String txt = null;
+        return switch (platform) {
+            case "Android" -> getAttribute(e, "text");
+            case "iOS" -> getAttribute(e, "label");
+            default -> null;
+        };
     }
 }

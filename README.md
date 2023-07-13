@@ -214,8 +214,38 @@ public HashMap<String, String> parseStringXML(InputStream file) throws Exception
 ### Part 4 - Support iOS Platform
 
 * Appium provides a common API to test both iOS and Android platforms.
-* We will add another test class to execute more test cases using same driver instance.
-* We will also see how we can leverage POM to add more test classes.
+* Download the .zip file for application to run on iPhone Simulator. Please note that .ipa file is for real device and
+  not for simulators, plus you need paid apple developers account and complete the code signing process to install the
+  app on real device.
+* Add the iOS driver initialization with switch statement.
+* Add the UI element locators for iOS
+* add the test for iOS in testng.xml
+* For iOS, the text attribute is not present, instead there is a label attribute. Therefore we created separate methods
+  for getting text and label in BaseTest class itself, so we can reuse them.
+* If the keyboard is not opening on simulator, then go to Hardware -> Keyboard -> Connect Hardware Keyboard option in Simulator and uncheck it.
+
+#### speed-up iOS Tests
+
+* It took long time for test executions on the iOS. I also experienced it.
+* This is probably because the Appium builds the WebDriverAgent server for your iOS simulator which consumes a lot of time and may some times fails.
+* If you have already run the appium tests once on simulator so it probably has WDA already installed on it. In this case, you can use the capability
+
+`"appium:usePrebuiltWDA": true
+`
+This will result in Appium using the prebuilt WDA and the test execution will speedup.
+
+* On further runs, Appium Server may also use the prebuilt WDA from cache, but i am not sure in which cases it uses WDA from cache.
+* You can also manually install the WDA agent on iOS by running the command in your terminal:
+
+`xcodebuild build-for-testing test-without-building -project <PATH-TO-XCODE-WDA-AGENT> -scheme WebDriverAgentRunner -destination id=<SIMULATOR-UDID> IPHONEOS_DEPLOYMENT_TARGET=<IOS-VERSION> GCC_TREAT_WARNINGS_AS_ERRORS=0 COMPILER_INDEX_STORE_ENABLE=NO
+`
+* replace the values as per your system environment and desired simulator e.g.
+* the path to WDA agent will be like `/Users/xxxx/.appium/node_modules/appium-xcuitest-driver/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj`
+* UDID and iOS Version  can be found by running `xcrun simctl list` in terminal
+* it will take some time, afterwards show the ** TEST BUILD SUCCEEDED ** in terminal, so after this you can close the terminal and execute the tests with prebuilt WDA.
+* Additionally, you can also provide additional capabilities of webDriverAgentUrl and derivedDataPath to further speed up the tests.
+
+
 
 #### Define Common Elements
 
@@ -228,6 +258,8 @@ public HashMap<String, String> parseStringXML(InputStream file) throws Exception
 
 
 ### Part 5 - Add more test cases | Define common elements | Write independent tests
+
+* 
 
 ### Scrolling - UIAutomator2 | Mobile Scroll
 

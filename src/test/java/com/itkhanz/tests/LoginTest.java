@@ -36,7 +36,7 @@ public class LoginTest extends BaseTest {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Failed to load the test user data from " + Constants.dataFileName);
+            throw new RuntimeException("Failed to load the test user data from " + Constants.dataFileName);
         }
     }
 
