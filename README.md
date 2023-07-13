@@ -134,6 +134,30 @@ Following sections summarize the important notes taken during the framework deve
     }
 ```
 
+#### Add Abstraction Layer for Test Data
+
+* We will use the `json` library from `org.json` to parse the Json for login user data.
+* [JSON In Java » 20230618](https://mvnrepository.com/artifact/org.json/json/20230618)
+
+```java
+    try {
+        loginDetails = getClass().getClassLoader().getResourceAsStream("data/loginUsers.json");
+        JSONTokener tokener = new JSONTokener(loginDetails);
+        loginUsersObject = new JSONObject(tokener);
+
+        if (loginDetails != null) {
+            loginDetails.close();
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        System.out.println("Failed to load the test user data from " + Constants.dataFileName);
+    }
+```
+
+* and then simply read the desired data e.g. 
+* `loginUsersObject.getJSONObject("invalidUser").getString("username")`
+* 
+
 ####
 
 ### Part 4 - Support iOS Platform
