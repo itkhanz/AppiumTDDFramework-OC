@@ -156,6 +156,54 @@ Following sections summarize the important notes taken during the framework deve
 
 * and then simply read the desired data e.g. 
 * `loginUsersObject.getJSONObject("invalidUser").getString("username")`
+
+#### Add Abstraction Layer for Static Text
+
+* We place the strings in `strings.xml` file. Normally we get this file from android developers who also use the
+  Strings.xml for storing strings, this way we do not have to create them separately for automation.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Error Text -->
+    <string name="err_invalid_username_or_password">Username and password do not match any user in this service.</string>
+    <string name="product_title">PRODUCTS</string>
+</resources>
+```
+* We will use the `DocumentBuilderFactory` to read the xml.
+```java
+public HashMap<String, String> parseStringXML(InputStream file) throws Exception{
+        HashMap<String, String> stringMap = new HashMap<String, String>();
+        //Get Document Builder
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        //Build Document
+        Document document = builder.parse(file);
+
+        //Normalize the XML Structure; It's just too important !!
+        document.getDocumentElement().normalize();
+
+        //Here comes the root node
+        Element root = document.getDocumentElement();
+
+        //Get all elements
+        NodeList nList = document.getElementsByTagName("string");
+
+        for (int temp = 0; temp < nList.getLength(); temp++)
+        {
+            Node node = nList.item(temp);
+            if (node.getNodeType() == Node.ELEMENT_NODE)
+            {
+                Element eElement = (Element) node;
+                // Store each element key value in map
+                stringMap.put(eElement.getAttribute("name"), eElement.getTextContent());
+            }
+        }
+        return stringMap;
+    }
+```
+* And then we can simply read it by parsing the XML stream as InputStream and storing it into HashMap.
 * 
 
 ####

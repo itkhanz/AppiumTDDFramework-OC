@@ -1,6 +1,7 @@
 package com.itkhanz;
 
 import com.itkhanz.constants.Constants;
+import com.itkhanz.utils.XMLUtils;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -23,7 +25,9 @@ public class BaseTest {
     //TODO move driver initialization to properties utils
     protected static AppiumDriver driver;
     protected static Properties props;
-    InputStream inputStream;
+    protected static HashMap<String, String> stringsMap = new HashMap<String, String>();
+    InputStream configStream;
+    InputStream stringsStream;
 
     public BaseTest() {
         PageFactory.initElements(new AppiumFieldDecorator(driver),this);
@@ -31,12 +35,16 @@ public class BaseTest {
 
     @Parameters({"platformName", "platformVersion", "deviceName", "udid"})
     @BeforeTest
-    public void setup(String platformName, String platformVersion, String deviceName, String udid) {
+    public void setup(String platformName, String platformVersion, String deviceName, String udid) throws Exception{
         try {
+            String xmlFileName = "strings/strings.xml";
+            stringsStream = getClass().getClassLoader().getResourceAsStream(xmlFileName);
+            stringsMap = XMLUtils.parseStringXML(stringsStream);
+
             props = new Properties();
             String propFileName = "config.properties";
-            inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-            props.load(inputStream);
+            configStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+            props.load(configStream);
 
             String appURL = Objects.requireNonNull(getClass().getResource(props.getProperty("androidAppLocation"))).getFile();
 
@@ -67,6 +75,9 @@ public class BaseTest {
         } catch (IOException e) {
             e.printStackTrace();
             throw  new RuntimeException("Failed to load the config.properties");
+        } finally {
+            if (configStream != null) configStream.close();
+            if (stringsStream != null) stringsStream.close();
         }
 
     }
