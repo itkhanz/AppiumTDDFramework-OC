@@ -10,9 +10,9 @@
         <parameter name="udid" value="emulator-5554" />
         <classes>
             <class name="com.itkhanz.tests.LoginTest">
-                <!--<methods>
+                <methods>
                     <include name="invalidUsernameTest"/>
-                </methods>-->
+                </methods>
             </class>
         </classes>
     </test> <!-- Test -->

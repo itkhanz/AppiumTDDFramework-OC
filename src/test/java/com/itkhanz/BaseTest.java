@@ -52,11 +52,12 @@ public class BaseTest {
                     .setAutomationName("UIAutomator2")
                     .setPlatformName(platformName)
                     .setPlatformVersion(platformVersion)
-                    .setDeviceName(deviceName)   //AvdId
+                    .setDeviceName(deviceName)   //AvdId (not needed with udid)
                     .setUdid(udid) //not needed when device name and platform version are enough to locate the emulator running
                     .setAppPackage(props.getProperty("androidAppPackage"))
                     .setAppActivity(props.getProperty("androidAppActivity"))
                     //.setApp(appURL) //not needed when app is pre-installed
+                    //.setAppWaitActivity(props.getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
                     //.setAvd("pixel_5")  //hw device name of emulator
                     ;
 
@@ -83,6 +84,7 @@ public class BaseTest {
     }
 
     //TODO driver must be initialized and closed after each test test method
+    //TODO add alwaysrun true
 
     @AfterTest
     public void teardown() {

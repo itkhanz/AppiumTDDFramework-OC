@@ -48,6 +48,12 @@ Following sections summarize the important notes taken during the framework deve
 > need to get the source code, then go through the code signing process to generate the IPA. You can follow the iOS real
 > device setup videos for the code signing process.
 
+> if you get an error "com.swaglabsmobileapp.SplashActivity' or '
+> com.swaglabsmobileapp.com.swaglabsmobileapp.SplashActivity' never started"  then you need to wait for the activity to
+> start and add the appWaitActivity com.swaglabsmobileapp.MainActivity in capabilities.
+
+[Error: Cannot start the 'com.swaglabsmobileapp' application. #79](https://github.com/saucelabs/sample-app-mobile/issues/79)
+
 * Code Duplication:
     * Username and password steps are being repeatedly used in each test case.
     * Distribute the element definition globally and reuse in each test case.
@@ -204,11 +210,22 @@ public HashMap<String, String> parseStringXML(InputStream file) throws Exception
     }
 ```
 * And then we can simply read it by parsing the XML stream as InputStream and storing it into HashMap.
-* 
-
-####
 
 ### Part 4 - Support iOS Platform
+
+* Appium provides a common API to test both iOS and Android platforms.
+* We will add another test class to execute more test cases using same driver instance.
+* We will also see how we can leverage POM to add more test classes.
+
+#### Define Common Elements
+
+* We will also see how to define UI elements which are common across pages.
+* The top bar of the app containing hamburger icon, logo, and cart is common to all the pages.
+* Also, the sidebar after clicking the menu settings icon is also common to all the pages.
+
+#### Failure recovery / Fail safe test cases
+* In case a test fails, we need to make sure that the next test does no get impacted and starts with the clean app state.
+
 
 ### Part 5 - Add more test cases | Define common elements | Write independent tests
 
