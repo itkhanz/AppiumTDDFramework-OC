@@ -3,15 +3,30 @@ package com.itkhanz.tests;
 import com.itkhanz.BaseTest;
 import com.itkhanz.pages.LoginPage;
 import com.itkhanz.pages.ProductsPage;
+import org.checkerframework.checker.index.qual.PolyUpperBound;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.lang.reflect.Method;
 
-public class LoginTest extends BaseTest {
+public class LoginTest {
     LoginPage loginPage;
     ProductsPage productsPage;
+    BaseTest base;
+
+    @Parameters({"platformName", "platformVersion", "deviceName", "udid"})
+    @BeforeClass
+    public void beforeClass(String platformName, String platformVersion, String deviceName, String udid) {
+        base = new BaseTest();
+        base.initializeDriver(platformName, platformVersion, deviceName, udid);
+
+    }
+
+    @AfterClass
+    public void afterClass() {
+        base = new BaseTest();
+        base.quitDriver();
+    }
 
     @BeforeMethod
     public void beforeMethod(Method m) {

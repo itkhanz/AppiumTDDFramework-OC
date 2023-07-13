@@ -79,8 +79,34 @@ Following sections summarize the important notes taken during the framework deve
 <img src="doc/framework-structure.png" width="1200">
 
 * Page Classes are added and extended from the BaseTest to reuse the methods and specify locators inside page classes.
+* We achieved following objectives so far:
+  * Avoid code duplication by reusing the elements.
+  * Improve code readability by adding actions methods for login in page.
+  * Scalable Automation by initializing the driver at BaseTest.
+  * Wait and Driver commands handling at single place i.e. BaseTest super class
+  * Modular and Independent test cases
+  * Parameterization of global properties through config.properties and testng parameters for device.
+    * All the parameters defined at test level will also be available to nested classes and methods in testng.xml
+    * If the parameters are provided at test level and driver is initialized at class level, it will work for sequential execution.
+    * But if you run the test classes in parallel, then it will try to install the same application parallel to all the
+      test classes because we are providing the same parameters to all the test classes.
+    * 
+
+* Inheritance approach has some disadvantages like one can create methods in child classes which will override the methods in
+  parent class, or declare the elements inside Test Class instead of Pages which is not a good practice.
+* 
 
 ### Part 3 - Alternate Design | Abstract Test Data & Static Text | Exception Handling
+
+* Go to the git branch `part3/alternate-design` to see the source code for this part.
+* This lecture will discuss:
+  * Alternate Design (no Inheritance)
+  * Exception Handling (Try/Catch, TestNG Listener)
+
+* This time we initialize the driver in test class itself with @BeforeClass annotated method which means that driver
+  will be initialized separately for each of the test class.
+* This is fine for sequential execution, but not for parallel runs because of the thread conflicts and also the same app
+  cannot be installed on same device for each class simultaneously. For this, we need multiple devices.
 
 ### Part 4 - Support iOS Platform
 

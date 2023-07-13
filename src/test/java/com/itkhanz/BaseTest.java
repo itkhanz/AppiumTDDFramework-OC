@@ -25,13 +25,21 @@ public class BaseTest {
     protected static Properties props;
     InputStream inputStream;
 
-    public BaseTest() {
-        PageFactory.initElements(new AppiumFieldDecorator(driver),this);
+    public void setDriver(AppiumDriver driver) {
+        this.driver = driver;
     }
 
-    @Parameters({"platformName", "platformVersion", "deviceName", "udid"})
-    @BeforeTest
-    public void setup(String platformName, String platformVersion, String deviceName, String udid) {
+    public AppiumDriver getDriver() {
+        return driver;
+    }
+
+    /*public BaseTest() {
+        PageFactory.initElements(new AppiumFieldDecorator(driver),this);
+    }*/
+
+    //@Parameters({"platformName", "platformVersion", "deviceName", "udid"})
+    //@BeforeTest
+    public void initializeDriver(String platformName, String platformVersion, String deviceName, String udid) {
         try {
             props = new Properties();
             String propFileName = "config.properties";
@@ -73,10 +81,15 @@ public class BaseTest {
 
     //TODO driver must be initialized and closed after each test test method
 
-    @AfterTest
+    /*@AfterTest
     public void teardown() {
         if (driver!= null) driver.quit();
+    }*/
+
+    public void quitDriver() {
+        driver.quit();
     }
+
 
     //TODO create separate Util class to manage waits
     //TODO overload the waitForVisibility method to accept custom waiting time
