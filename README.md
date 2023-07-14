@@ -311,6 +311,7 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 * UiScrollable and UiSelector are part of the UiAutomator native android driver.
 * Appium provides API to perform scrolling through UiAutomator2 driver.
 * The disadvantage of this approach is that the syntax for this action will only be checked during run-time.
+
 ```java
     private WebElement SLBPrice() {
         return driver.findElement(AppiumBy.androidUIAutomator(
@@ -319,6 +320,7 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
     }
 ```
 > UiScrollable does not support single quite for nested commas, instead always use double quotes with escape character.
+
 > If there is only one scrollable element on the page, then you dont have to find the parent scrollable element and you can just use .scrollable(true)  
 
 #### iOS Scroll
@@ -344,6 +346,57 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 ```
 
 ### Capture Screenshots
+
+#### Capture screenshot for failed test case using TestNG listener.
+* Copy screenshot by creating below folder structure:
+  * `\Screenshots`
+  * `\<platformName>_<platformVersion>_<deviceName>` (facilitates screenshot capturing in case of parallel execution)
+  * `\<dateTime - yyy-MM-dd-HH-mm-ss>` (Ensures sceenshot are not overwritten - can also use build number CI/CD)
+  * `\<testClass>` (lists all methods as per test classes)
+  * `\<methodName.png>` (helps identify the failed method)
+
+```java
+        //Screenshot capture and save to formatted imagePath
+        Map<String, String> testParams = new HashMap<String, String>();
+        testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
+
+        String imagePath =  "screenshots" + File.separator
+                            + TestUtils.getFormattedDateTime() + File.separator
+                            + testParams.get("platformName") + "_" + testParams.get("deviceName") + File.separator
+                            + result.getTestClass().getRealClass().getSimpleName() + File.separator
+                            + result.getName() + ".png";
+
+        BaseTest base = new BaseTest();
+        File file = base.getDriver().getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(file, new File(imagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to save the screenshot");
+        }
+```
+
+* screenshot folder will look like this: 
+
+<img src="doc/screenshote-folder.png">
+
+#### Add screenshot to TestNG report HTML
+
+* By default, IntelliJ does not generate test-output folder, and so you cannot view the TestNG HTML report.
+* To get it in IntelliJ, you have to do a small change in settings.
+  * At the top select the dropdown and click on edit configuration
+  * Check on Use default reporters which is under listener tab option which will create test-output folder in your root
+    folder with all reports.
+
+* [How can I include a failure screenshot to the testNG report](https://stackoverflow.com/a/8970314/7673215)
+* You can call your screenshot grabbing method and use `Reporter.log` to put the hyperlink to that screenshot. Then you
+  can find this link under the failed testcases details.
+```java
+    Reporter.log("<a href='"+ destFile.getAbsolutePath() + "'> <img src='"+ destFile.getAbsolutePath() + "' height='100' width='100'/> </a>");
+```
+
+* IntelliJ shows broken image in the browser. For previewing the report with image, view it by opening it in browser
+  from system instead of from Intellij server.
 
 ### Record Videos
 

@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
@@ -32,6 +34,7 @@ public class BaseTest {
     protected static Properties props;
     protected static HashMap<String, String> stringsMap = new HashMap<>();
     protected static String platform;
+    protected static String dateTime;
     InputStream configStream;
     InputStream stringsStream;
 
@@ -108,10 +111,13 @@ public class BaseTest {
 
     //TODO driver must be initialized and closed after each test test method
     //TODO add alwaysrun true
-
     @AfterTest
     public void teardown() {
         if (driver!= null) driver.quit();
+    }
+
+    public AppiumDriver getDriver() {
+        return driver;
     }
 
     public void closeApp() {

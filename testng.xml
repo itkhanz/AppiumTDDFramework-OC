@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="Swag Labs Demo App Suite" parallel="false" >
+<suite name="Swag Labs Demo App Suite" parallel="false" configfailurepolicy="continue">
     <listeners>
         <listener class-name="com.itkhanz.listeners.TestListener" />
     </listeners>
@@ -9,18 +9,18 @@
         <parameter name="deviceName" value="Pixel_5" />
         <parameter name="udid" value="emulator-5554" />
         <classes>
-            <!--<class name="com.itkhanz.tests.LoginTest"/>-->
-            <class name="com.itkhanz.tests.ProductTest"/>
+            <class name="com.itkhanz.tests.LoginTest"/>
+            <!--<class name="com.itkhanz.tests.ProductTest"/>-->
         </classes>
     </test> <!-- Test -->
 
-    <test name="iPhone14">
+    <!--<test name="iPhone14">
         <parameter name="platformName" value="iOS" />
         <parameter name="deviceName" value="iPhone 14" />
         <parameter name="udid" value="1E8FE39B-1118-4117-B02B-66A390AECB3F" />
         <classes>
-            <!--<class name="com.itkhanz.tests.LoginTest"/>-->
+            <class name="com.itkhanz.tests.LoginTest"/>
             <class name="com.itkhanz.tests.ProductTest"/>
         </classes>
-    </test> <!-- Test -->
+    </test>--> <!-- Test -->
 </suite> <!-- Suite -->

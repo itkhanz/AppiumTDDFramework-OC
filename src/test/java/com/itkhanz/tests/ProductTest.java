@@ -64,7 +64,7 @@ public class ProductTest extends BaseTest {
         loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
     }
 
-    @Test(enabled = false)
+    @Test
     public void validateProductOnProductsPage() {
         String SLBTitle = productsPage.getSLBTitle();
         String SLBPrice = productsPage.getSLBPrice();

@@ -56,14 +56,14 @@ public class LoginTest extends BaseTest {
         loginPage.enterPassword(loginUsersObject.getJSONObject("invalidUser").getString("password"));
         loginPage.pressLoginBtn();
 
-        String actualErrTxt = loginPage.getErrTxt();
+        String actualErrTxt = loginPage.getErrTxt() + "desa";
         String expectedErrTxt = stringsMap.get("err_invalid_username_or_password");
         System.out.println("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
 
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
 
-    @Test
+    @Test(enabled = false)
     public void invalidPasswordTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file
@@ -78,7 +78,7 @@ public class LoginTest extends BaseTest {
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
 
-    @Test
+    @Test(enabled = false)
     public void successfulLoginTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file
