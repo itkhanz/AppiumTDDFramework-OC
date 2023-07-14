@@ -1,8 +1,8 @@
 package com.itkhanz;
 
 import com.itkhanz.constants.Constants;
+import com.itkhanz.utils.TestUtils;
 import com.itkhanz.utils.XMLUtils;
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.android.AndroidDriver;
@@ -10,21 +10,23 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
+import io.appium.java_client.screenrecording.CanRecordScreen;
+import org.apache.commons.codec.binary.Base64;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.ITestResult;
 import org.testng.annotations.*;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 public class BaseTest {
 
@@ -118,6 +120,48 @@ public class BaseTest {
 
     public AppiumDriver getDriver() {
         return driver;
+    }
+
+    @BeforeMethod
+    public void beforeMethodBase() {
+        System.out.println(".....super before method.....");
+        ((CanRecordScreen) driver).startRecordingScreen();
+    }
+
+    //stop video capturing and create *.mp4 file
+    @AfterMethod
+    public void afterMethodBase(ITestResult result) throws IOException {
+        System.out.println(".....super after method.....");
+        String media = ((CanRecordScreen) getDriver()).stopRecordingScreen();
+
+        Map<String, String> testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
+
+        //TODO datetime will be different this time because the sceeenshot is captured in listener which executes before this  method which causes few seconds difference so separatte folder is getting created for videos
+        //TODO sync the time for both screenshots and videos so both are created under single timestamp
+        String dirPath =  "media" + File.separator
+                + testParams.get("platformName") + "_" + testParams.get("deviceName") + File.separator
+                + "videos" + File.separator
+                + TestUtils.getFormattedDateTime() + File.separator
+                + result.getTestClass().getRealClass().getSimpleName()
+                ;
+
+        File videoDir = new File(dirPath);
+        if(!videoDir.exists()) {
+            videoDir.mkdirs();
+        }
+        FileOutputStream stream = null;
+        try {
+            stream = new FileOutputStream(videoDir + File.separator + result.getName() + ".mp4");
+            stream.write(Base64.decodeBase64(media));
+            stream.close();
+            System.out.println("video path: " + videoDir + File.separator + result.getName() + ".mp4");
+        } catch (Exception e) {
+            System.out.println("error during video capture" + e.toString());
+        } finally {
+            if(stream != null) {
+                stream.close();
+            }
+        }
     }
 
     public void closeApp() {

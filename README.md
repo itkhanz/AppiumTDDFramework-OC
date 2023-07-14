@@ -354,6 +354,7 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
   * `\<dateTime - yyy-MM-dd-HH-mm-ss>` (Ensures sceenshot are not overwritten - can also use build number CI/CD)
   * `\<testClass>` (lists all methods as per test classes)
   * `\<methodName.png>` (helps identify the failed method)
+* This folder structure will ensure that the screenshots will not get overwritten
 
 ```java
         //Screenshot capture and save to formatted imagePath
@@ -382,7 +383,7 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 #### Add screenshot to TestNG report HTML
 
-* By default, IntelliJ does not generate test-output folder, and so you cannot view the TestNG HTML report.
+> By default, IntelliJ does not generate test-output folder, and so you cannot view the TestNG HTML report.
 * To get it in IntelliJ, you have to do a small change in settings.
   * At the top select the dropdown and click on edit configuration
   * Check on Use default reporters which is under listener tab option which will create test-output folder in your root
@@ -395,10 +396,32 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
     Reporter.log("<a href='"+ destFile.getAbsolutePath() + "'> <img src='"+ destFile.getAbsolutePath() + "' height='100' width='100'/> </a>");
 ```
 
-* IntelliJ shows broken image in the browser. For previewing the report with image, view it by opening it in browser
+> IntelliJ shows broken image in the browser. For previewing the report with image, view it by opening it in browser
   from system instead of from Intellij server.
 
+
 ### Record Videos
+
+* You have two options to record videos.
+* First option is to start and stop the recording in TestNG listener:
+  * Start the recording in `onTestStart` method
+  * Stop the recording in both `onTestFailure` and `onTestSuccess` because there is no single method provided by the
+    test listener to check the test finish on both success and failure.
+* Other option is  to start and stop the recording at Test Classes in `@BeforeMethod` `@AfterMethod` methods.
+  * The problem with this approach is in case of multiple test classes, then we will have to implement it in all of the
+    test classes which causes code duplication.
+  * Solution is to create the `@BeforeMethod` `@AfterMethod` methods in parent class BaseTest which means that the
+    TestNG will first execute the methods in parent class and then in child. so we can write the code for video
+    recording at super class level.
+* [Start Recording Screen](https://appium.readthedocs.io/en/latest/en/commands/device/recording-screen/start-recording-screen/)
+* [Apache Commons Codec](https://mvnrepository.com/artifact/commons-codec/commons-codec/1.16.0) library is used to decode the base64 string to byte[]
+* You can also choose to save the video recording in case of failed only test cases with `result.getStatus()` method. 
+* This returns the status as success = 1, failure = 2, skip = 3
+* For iOS we need to install ffmpeg library for recordings
+* `brew install ffmpeg`
+> if mp4 videos are not played by default, then you can specify another non-default codec. Both mpeg4 and libx264 work fine.
+> ((CanRecordScreen) driver).startRecordingScreen(IOSStartScreenRecordingOptions.startScreenRecordingOptions().withVideoType("mpeg4"));
+
 
 ### Parallel Execution using Real Android and iOS devices
 

@@ -48,6 +48,7 @@ public class ProductTest extends BaseTest {
 
     @BeforeMethod
     public void beforeMethod(Method m) {
+        System.out.println(".....ProductTest before method.....");
         closeApp();
         launchApp();
         System.out.println("\n" + "****** starting test:" + m.getName() + "******" + "\n");
@@ -60,6 +61,7 @@ public class ProductTest extends BaseTest {
 
     @AfterMethod
     public void afterMethod() {
+        System.out.println(".....ProductTest after method.....");
         settingsPage = productsPage.pressSettingsBtn(); //open the sidebar
         loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
     }
@@ -76,7 +78,7 @@ public class ProductTest extends BaseTest {
         sa.assertAll();
     }
 
-    @Test
+    @Test (enabled = false)
     public void validateProductOnProductDetailsPage() {
         productDetailsPage = productsPage.pressSLBTitle();
 

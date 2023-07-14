@@ -7,6 +7,7 @@ import com.itkhanz.pages.ProductsPage;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -42,10 +43,16 @@ public class LoginTest extends BaseTest {
 
     @BeforeMethod
     public void beforeMethod(Method m) {
+        System.out.println(".....LoginTest before method.....");
         closeApp();
         launchApp();
         System.out.println("\n" + "****** starting test:" + m.getName() + "******" + "\n");
         loginPage = new LoginPage();
+    }
+
+    @AfterMethod()
+    public void afterMethod(){
+        System.out.println(".....LoginTest after method.....");
     }
 
     @Test
@@ -56,7 +63,7 @@ public class LoginTest extends BaseTest {
         loginPage.enterPassword(loginUsersObject.getJSONObject("invalidUser").getString("password"));
         loginPage.pressLoginBtn();
 
-        String actualErrTxt = loginPage.getErrTxt() + "desa";
+        String actualErrTxt = loginPage.getErrTxt();
         String expectedErrTxt = stringsMap.get("err_invalid_username_or_password");
         System.out.println("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
 
