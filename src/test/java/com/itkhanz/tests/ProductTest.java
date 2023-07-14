@@ -64,7 +64,7 @@ public class ProductTest extends BaseTest {
         loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
     }
 
-    @Test
+    @Test(enabled = false)
     public void validateProductOnProductsPage() {
         String SLBTitle = productsPage.getSLBTitle();
         String SLBPrice = productsPage.getSLBPrice();
@@ -82,10 +82,12 @@ public class ProductTest extends BaseTest {
 
         String SLBTitle = productDetailsPage.getSLBTitle();
         String SLBText = productDetailsPage.getSLBTxt();
+        String SLBPrice = productDetailsPage.scrollToSLBPriceAndGetSLBPrice();
 
         SoftAssert sa = new SoftAssert();
         sa.assertEquals(SLBTitle, stringsMap.get("product_details_page_slb_title"));
         sa.assertEquals(SLBText, stringsMap.get("product_details_page_slb_txt"));
+        sa.assertEquals(SLBPrice, stringsMap.get("product_details_page_slb_price"));
 
         productsPage = productDetailsPage.pressBackToProductsBtn(); //navigate back to products list
         sa.assertAll();

@@ -14,13 +14,13 @@
         </classes>
     </test> <!-- Test -->
 
-    <!--<test name="iPhone14">
+    <test name="iPhone14">
         <parameter name="platformName" value="iOS" />
         <parameter name="deviceName" value="iPhone 14" />
         <parameter name="udid" value="1E8FE39B-1118-4117-B02B-66A390AECB3F" />
         <classes>
-            <class name="com.itkhanz.tests.LoginTest"/>
+            <!--<class name="com.itkhanz.tests.LoginTest"/>-->
             <class name="com.itkhanz.tests.ProductTest"/>
         </classes>
-    </test>--> <!-- Test -->
+    </test> <!-- Test -->
 </suite> <!-- Suite -->

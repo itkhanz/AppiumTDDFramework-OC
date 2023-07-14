@@ -22,6 +22,22 @@ This repo contains the source code for Appium Java TDD Framework designed during
 * Maven surefire plugin 3.1.2
 * Demo Apps
     * [Sauce Labs Native Sample Application](https://github.com/saucelabs/sample-app-mobile)
+* IntelliJ IDE
+
+--
+
+## Pre-requisites
+
+* Install Maven
+* Install Appium 2.0
+* Install uiautomator2, xcuitest drivers
+* Install Android Studio and setup Emulator
+* Install XCode and setup Simulator (only for MAC)
+* Configure Path variables as per your OS
+* Verify the setup with appium-doctor
+* Configure global properties in config.properties in src/test/resources
+* configure device specific parameters in testng.xml
+* Run tests with testng.xml
 
 --
 
@@ -287,6 +303,45 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 
 ### Scrolling - UIAutomator2 | Mobile Scroll
+
+#### Android Scroll
+
+* To verify the product price on ProductDetailsPage, we need to implement scrolling mechanism.
+* [UiScrollable](https://developer.android.com/reference/androidx/test/uiautomator/UiScrollable)
+* UiScrollable and UiSelector are part of the UiAutomator native android driver.
+* Appium provides API to perform scrolling through UiAutomator2 driver.
+* The disadvantage of this approach is that the syntax for this action will only be checked during run-time.
+```java
+    private WebElement SLBPrice() {
+        return driver.findElement(AppiumBy.androidUIAutomator(
+                "new UiScrollable(new UiSelector()" + ".scrollable(true)).scrollIntoView("
+                        + "new UiSelector().description(\"test-Price\"));"));
+    }
+```
+> UiScrollable does not support single quite for nested commas, instead always use double quotes with escape character.
+> If there is only one scrollable element on the page, then you dont have to find the parent scrollable element and you can just use .scrollable(true)  
+
+#### iOS Scroll
+
+* [mobile: scroll](https://appium.github.io/appium-xcuitest-driver/4.32/execute-methods/#mobile-scroll)
+```java
+    private void iOSScrollToSLBPrice() {
+        String elementID = ((RemoteWebElement)SLBPrice).getId();
+        HashMap<String, Object> scrollMap = new HashMap<>();
+        scrollMap.put("element", elementID);
+        scrollMap.put("toVisible", true);
+        driver.executeScript("mobile: scroll", scrollMap);
+    }
+```
+* [mobile: scrollToElement](https://appium.github.io/appium-xcuitest-driver/4.32/execute-methods/#mobile-scrolltoelement)
+```java
+    private void iOSScrollToSLBPrice() {
+        String elementID = ((RemoteWebElement)SLBPrice).getId();
+        HashMap<String, Object> scrollMap = new HashMap<>();
+        scrollMap.put("element", elementID);
+        driver.executeScript("mobile: scrollToElement", scrollMap);
+    }
+```
 
 ### Capture Screenshots
 
