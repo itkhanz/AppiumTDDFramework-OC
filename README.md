@@ -246,20 +246,45 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 * Additionally, you can also provide additional capabilities of webDriverAgentUrl and derivedDataPath to further speed up the tests.
 
 
+### Part 5 - Add more test cases | Define common elements | Write independent tests
+
+* We add two more test cases for verifying the title and price of `Sauce labs Backpack` item on ProductsPage and ProductDetailsPage.
+* Before we execute any test methods, the app state must be reset i.e. the app must be at the login page at test start.
+* For this purpose, we add the two utility methods in BaseTest.
+```java
+    public void closeApp() {
+        switch (platform) {
+            case "Android" -> ((InteractsWithApps) driver).terminateApp(props.getProperty("androidAppPackage"));
+            case "iOS" -> ((InteractsWithApps) driver).terminateApp(props.getProperty("iOSBundleId"));
+        }
+    }
+
+    public void launchApp() {
+        switch (platform) {
+            case "Android" -> ((InteractsWithApps) driver).activateApp(props.getProperty("androidAppPackage"));
+            case "iOS" -> ((InteractsWithApps) driver).activateApp(props.getProperty("iOSBundleId"));
+        }
+    }
+```
+* To make test methods independent, we put it in the @BeforeMethod and @AfterMethod of our test classes.
 
 #### Define Common Elements
 
 * We will also see how to define UI elements which are common across pages.
 * The top bar of the app containing hamburger icon, logo, and cart is common to all the pages.
 * Also, the sidebar after clicking the menu settings icon is also common to all the pages.
+* Create Pages for MenuPage and SettingsPage.
+> If the element is not located by Appium Inspector, then try to locate it by expanding XML.
+* We extend the ProductsPage to MenuPage and then ManuPage to BaseTest, since MenuPage is common to many pages such as ProductsPage, ProductsDetailsPage.
 
 #### Failure recovery / Fail safe test cases
+* Added print statements to all the methods in order to have logging for debugging.
 * In case a test fails, we need to make sure that the next test does no get impacted and starts with the clean app state.
+* Currently, the tests for ProductTest class are not completely independent because if the if the first test case fails
+  for some reason then this will not bring the application to clean state, so the second test will not start from the
+  fresh state.
+* To make the test cases completely independent of failures, we can handle the login and logout in @BeforeMethod and @AfterMethod
 
-
-### Part 5 - Add more test cases | Define common elements | Write independent tests
-
-* 
 
 ### Scrolling - UIAutomator2 | Mobile Scroll
 

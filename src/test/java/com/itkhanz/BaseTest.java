@@ -3,6 +3,7 @@ package com.itkhanz;
 import com.itkhanz.constants.Constants;
 import com.itkhanz.utils.XMLUtils;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
@@ -110,6 +111,20 @@ public class BaseTest {
     @AfterTest
     public void teardown() {
         if (driver!= null) driver.quit();
+    }
+
+    public void closeApp() {
+        switch (platform) {
+            case "Android" -> ((InteractsWithApps) driver).terminateApp(props.getProperty("androidAppPackage"));
+            case "iOS" -> ((InteractsWithApps) driver).terminateApp(props.getProperty("iOSBundleId"));
+        }
+    }
+
+    public void launchApp() {
+        switch (platform) {
+            case "Android" -> ((InteractsWithApps) driver).activateApp(props.getProperty("androidAppPackage"));
+            case "iOS" -> ((InteractsWithApps) driver).activateApp(props.getProperty("iOSBundleId"));
+        }
     }
 
     //TODO create separate Util class to manage waits

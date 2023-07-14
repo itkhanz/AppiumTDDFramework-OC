@@ -26,24 +26,35 @@ public class LoginPage extends BaseTest {
 
     public LoginPage enterUserName(String username) {
         clear(usernameTxtFld);  //iOS may not clear the text input field automatically when entering text
+        System.out.println("login with user: " + username);
         sendKeys(usernameTxtFld, username);
         return this;
     }
 
     public LoginPage enterPassword(String password) {
         clear(passwordTxtFld);
+        System.out.println("password is: " + password);
         sendKeys(passwordTxtFld, password);
         return this;
     }
 
     public ProductsPage pressLoginBtn() {
+        System.out.println("pressing login button");
         click(loginBtn);
         return new ProductsPage();
+    }
+
+    public ProductsPage login(String username, String password) {
+        enterUserName(username);
+        enterPassword(password);
+        return pressLoginBtn();
     }
 
     public String getErrTxt() {
         //since text attribute does not exist for iOS, so we wrote a custom method to return text or label based on platform
         //return getAttribute(errTxt, "text");
-        return getLabelText(errTxt);
+        String err = getLabelText(errTxt);
+        System.out.println("login error text is - " + err);
+        return err;
     }
 }
