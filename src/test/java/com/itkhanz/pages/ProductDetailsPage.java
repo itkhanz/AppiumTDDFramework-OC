@@ -29,7 +29,7 @@ public class ProductDetailsPage extends MenuPage{
     This will scroll to the price using UiScrollable and return WebElement
      */
     private WebElement AndroidScrollToSLBPrice() {
-        return driver.findElement(AppiumBy.androidUIAutomator(
+        return getDriver().findElement(AppiumBy.androidUIAutomator(
                 "new UiScrollable(new UiSelector().scrollable(true))." +
                         "scrollIntoView(" +
                             "new UiSelector().description(\"test-Price\")" +
@@ -51,7 +51,7 @@ public class ProductDetailsPage extends MenuPage{
 
         //Second way
         //or use mobile: scrollToElement which scrolls the current viewport to the given element.
-        driver.executeScript("mobile: scrollToElement", scrollMap);
+        getDriver().executeScript("mobile: scrollToElement", scrollMap);
     }
 
     public String getSLBTitle() {
@@ -74,7 +74,7 @@ public class ProductDetailsPage extends MenuPage{
 
     public String scrollToSLBPriceAndGetSLBPrice() {
         //TODO use W3C Actions to implement platform independent scrolling
-        switch (platform) {
+        switch (getPlatform()) {
             case "Android" -> {
                 return getLabelText(AndroidScrollToSLBPrice());
             }

@@ -64,7 +64,7 @@ public class LoginTest extends BaseTest {
         loginPage.pressLoginBtn();
 
         String actualErrTxt = loginPage.getErrTxt();
-        String expectedErrTxt = stringsMap.get("err_invalid_username_or_password");
+        String expectedErrTxt = getStringsMap().get("err_invalid_username_or_password");
         System.out.println("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
 
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
@@ -79,7 +79,7 @@ public class LoginTest extends BaseTest {
         loginPage.pressLoginBtn();
 
         String actualErrTxt = loginPage.getErrTxt();
-        String expectedErrTxt = stringsMap.get("err_invalid_username_or_password");
+        String expectedErrTxt = getStringsMap().get("err_invalid_username_or_password");
         System.out.println("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
 
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
@@ -94,7 +94,7 @@ public class LoginTest extends BaseTest {
         productsPage = loginPage.pressLoginBtn();
 
         String actualProductTitle = productsPage.getTitle();
-        String expectedProductTitle = stringsMap.get("product_title");
+        String expectedProductTitle = getStringsMap().get("product_title");
         System.out.println("actual product title - " + actualProductTitle + "\n" + "expected title - " + expectedProductTitle);
 
         Assert.assertEquals(actualProductTitle, expectedProductTitle);

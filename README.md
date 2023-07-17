@@ -420,10 +420,63 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 * For iOS we need to install ffmpeg library for recordings
 * `brew install ffmpeg`
 > if mp4 videos are not played by default, then you can specify another non-default codec. Both mpeg4 and libx264 work fine.
-> ((CanRecordScreen) driver).startRecordingScreen(IOSStartScreenRecordingOptions.startScreenRecordingOptions().withVideoType("mpeg4"));
 
+`((CanRecordScreen) driver).startRecordingScreen(IOSStartScreenRecordingOptions.startScreenRecordingOptions().withVideoType("mpeg4"));
+`
 
 ### Parallel Execution using Real Android and iOS devices
+
+* Following things have to be considered for parallel execution:
+  * Server side changes
+  * Client side changes
+  * Thread safe automation changes
+  * Different level of parallel execution
+  * logging with parallel execution
+  * Appium and TestNG bugs
+  * Atomic tests - each test case should run independently
+
+* [Parallel tests documentation](https://appium.readthedocs.io/en/stable/en/advanced-concepts/parallel-tests/)
+  [Appium Parallel Execution Docs](https://github.com/appium/appium/blob/1.x/docs/en/advanced-concepts/parallel-tests.md)
+
+<img src="doc/parallel-execution-option-1.png" width="900">
+
+<img src="doc/parallel-execution-option-2.png" width="900">
+
+<img src="doc/parallel-execution-option-3-4.png" width="900">
+
+* For the purpose of this framework, option 1 and 2 will be implemented.
+
+<img src="doc/parallel-execution-client-side-changes.png" width="900">
+
+<img src="doc/parallel-execution-thread-saftety.png" width="900">
+
+<img src="doc/parallel-execution-testng-levels.png" width="900">
+
+* Different level of parallel execution.
+  * In case of web automation, setting parallel execution at method level is way to go, but for mobile automation parallel execution at test level is the preffered way.
+  * Therefore we will choose the parallel execution at test level.
+
+<img src="doc/parallel-tests.png" width="900">
+
+<img src="doc/parallel-classes.png" width="900">
+
+<img src="doc/parallel-methods.png" width="900">
+
+* Logging mechanism
+
+<img src="doc/logs.png" width="900">
+
+* Possible issues:
+  * [iOS13: Sometimes driver fails to start with busy port problem](https://github.com/appium/appium/issues/13452)
+  * [https://github.com/testng-team/testng/issues/2243](https://github.com/testng-team/testng/issues/2243)
+  
+* Now we will make the desired changes to framework that will support parallel execution for upto 4 devices:
+
+<img src="doc/parallel-execution-devices.png" width="900">
+
+* First we change the class level global variables to ThreadLocal
+* No we need to remove class level references to global variables, and instead use getters and setters.
+* 
 
 ### Log4j2 Logging framework integration
 

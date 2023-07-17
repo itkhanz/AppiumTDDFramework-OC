@@ -32,60 +32,98 @@ public class BaseTest {
 
     //TODO move driver initialization to driver factory and make driver threadlocal
     //TODO move driver initialization to properties utils
-    protected static AppiumDriver driver;
-    protected static Properties props;
-    protected static HashMap<String, String> stringsMap = new HashMap<>();
-    protected static String platform;
-    protected static String dateTime;
-    InputStream configStream;
-    InputStream stringsStream;
+    protected static ThreadLocal<AppiumDriver> driver = new ThreadLocal<AppiumDriver>();
+    protected static ThreadLocal<Properties> props = new ThreadLocal<Properties>();
+    protected static ThreadLocal<HashMap<String, String>> stringsMap = new ThreadLocal<HashMap<String, String>>();
+    protected static ThreadLocal<String>  platform = new ThreadLocal<String>();
+    public static ThreadLocal<String> dateTime = new ThreadLocal<String>();
+
+    public AppiumDriver getDriver() {
+        return driver.get();
+    }
+    public void setDriver(AppiumDriver dr) {
+        driver.set(dr);
+    }
+
+    public Properties getProps() {
+        return props.get();
+    }
+    public void setProps(Properties pr) {
+        props.set(pr);
+    }
+
+    public HashMap<String, String> getStringsMap() {
+        return stringsMap.get();
+    }
+    public void setStringsMap(HashMap<String, String> stMap) {
+        stringsMap.set(stMap);
+    }
+
+    public String getPlatform() {
+        return platform.get();
+    }
+    public void setPlatform(String pl) {
+        platform.set(pl);
+    }
+
+    public String getDateTime() {
+        return dateTime.get();
+    }
+    public void setDateTime(String dt) {
+        dateTime.set(dt);
+    }
 
     public BaseTest() {
-        PageFactory.initElements(new AppiumFieldDecorator(driver),this);
+        PageFactory.initElements(new AppiumFieldDecorator(getDriver()),this);
     }
 
     @Parameters({"platformName", "deviceName", "udid"})
     @BeforeTest
     public void setup(String platformName, String deviceName, String udid) throws Exception{
+        InputStream configStream = null;
+        InputStream stringsStream = null;
+        Properties props = new Properties();
+        AppiumDriver driver;
+
+        setPlatform(platformName); //we declared platform as protected class variable because we need this info in test cases
         try {
             String xmlFileName = "strings/strings.xml";
             stringsStream = getClass().getClassLoader().getResourceAsStream(xmlFileName);
-            stringsMap = XMLUtils.parseStringXML(stringsStream);
+            setStringsMap(XMLUtils.parseStringXML(stringsStream));
 
-            props = new Properties();
             String propFileName = "config.properties";
             configStream = getClass().getClassLoader().getResourceAsStream(propFileName);
             props.load(configStream);
+            setProps(props);
 
             try {
-                platform = platformName; //we declared platform as protected class variable because we need this info in test cases
                 URL url = new URL(props.getProperty("appiumURL"));
                 switch (platformName) {
                     case "Android" -> {
                         //get the complete path of the app on local machine (it will append the root path with the property)
-                        String appURL = Objects.requireNonNull(getClass().getResource(props.getProperty("androidAppLocation"))).getFile();
+                        String appURL = Objects.requireNonNull(getClass().getResource(getProps().getProperty("androidAppLocation"))).getFile();
                         UiAutomator2Options options = new UiAutomator2Options()
-                                .setAutomationName(props.getProperty("androidAutomationName"))
+                                .setAutomationName(getProps().getProperty("androidAutomationName"))
                                 .setPlatformName(platformName)
                                 .setDeviceName(deviceName)   //AvdId (not needed with udid)
                                 .setUdid(udid) //UDID is preferred over platform version and platform name to uniquely identify device
-                                .setAppPackage(props.getProperty("androidAppPackage"))
-                                .setAppActivity(props.getProperty("androidAppActivity"))
+                                .setAppPackage(getProps().getProperty("androidAppPackage"))
+                                .setAppActivity(getProps().getProperty("androidAppActivity"))
                                 //.setApp(appURL) //not needed when app is pre-installed
-                                .setAppWaitActivity(props.getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
+                                .setAppWaitActivity(getProps().getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
                                 //.setAvd(deviceName)  //hw device name of emulator e.g. Pixel_5, it automatically opens up the emulator
                                 ;
                         driver = new AndroidDriver(url, options);
                     }
                     case "iOS" -> {
                         //get the complete path of the app on local machine (it will append the root path with the property)
-                        String appURL = Objects.requireNonNull(getClass().getResource(props.getProperty("iOSAppLocation"))).getFile();
+                        String appURL = Objects.requireNonNull(getClass().getResource(getProps().getProperty("iOSAppLocation"))).getFile();
                         XCUITestOptions options = new XCUITestOptions()
-                                .setAutomationName(props.getProperty("iOSAutomationName"))
+                                .setAutomationName(getProps().getProperty("iOSAutomationName"))
                                 .setPlatformName(platformName)
                                 .setDeviceName(deviceName)   // not needed with udid
                                 .setUdid(udid) //not needed when device name and platform version are enough to locate the emulator running
-                                .setBundleId(props.getProperty("iOSBundleId")) //not needed with appUrl
+                                .setBundleId(getProps().getProperty("iOSBundleId")) //not needed with appUrl
                                 //.setApp(appURL) //not needed when app is pre-installed
                                 .setUsePrebuiltWda(true)    //speeds up the test execution if WDA is already on the device
                                 ;
@@ -93,6 +131,7 @@ public class BaseTest {
                     }
                     default -> throw new RuntimeException("Inavlid platform! - " + platformName);
                 }
+                setDriver(driver);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 throw  new RuntimeException("Failed to initialize URL for Appium Session: " + "http://127.0.0.1:4723");
@@ -115,17 +154,13 @@ public class BaseTest {
     //TODO add alwaysrun true
     @AfterTest
     public void teardown() {
-        if (driver!= null) driver.quit();
-    }
-
-    public AppiumDriver getDriver() {
-        return driver;
+        if (getDriver()!= null) getDriver().quit();
     }
 
     @BeforeMethod
     public void beforeMethodBase() {
         System.out.println(".....super before method.....");
-        ((CanRecordScreen) driver).startRecordingScreen();
+        ((CanRecordScreen) getDriver()).startRecordingScreen();
     }
 
     //stop video capturing and create *.mp4 file
@@ -141,7 +176,7 @@ public class BaseTest {
         String dirPath =  "media" + File.separator
                 + testParams.get("platformName") + "_" + testParams.get("deviceName") + File.separator
                 + "videos" + File.separator
-                + TestUtils.getFormattedDateTime() + File.separator
+                + getDateTime() + File.separator
                 + result.getTestClass().getRealClass().getSimpleName()
                 ;
 
@@ -165,16 +200,16 @@ public class BaseTest {
     }
 
     public void closeApp() {
-        switch (platform) {
-            case "Android" -> ((InteractsWithApps) driver).terminateApp(props.getProperty("androidAppPackage"));
-            case "iOS" -> ((InteractsWithApps) driver).terminateApp(props.getProperty("iOSBundleId"));
+        switch (getPlatform()) {
+            case "Android" -> ((InteractsWithApps) getDriver()).terminateApp(getProps().getProperty("androidAppPackage"));
+            case "iOS" -> ((InteractsWithApps) getDriver()).terminateApp(getProps().getProperty("iOSBundleId"));
         }
     }
 
     public void launchApp() {
-        switch (platform) {
-            case "Android" -> ((InteractsWithApps) driver).activateApp(props.getProperty("androidAppPackage"));
-            case "iOS" -> ((InteractsWithApps) driver).activateApp(props.getProperty("iOSBundleId"));
+        switch (getPlatform()) {
+            case "Android" -> ((InteractsWithApps) getDriver()).activateApp(getProps().getProperty("androidAppPackage"));
+            case "iOS" -> ((InteractsWithApps) getDriver()).activateApp(getProps().getProperty("iOSBundleId"));
         }
     }
 
@@ -182,7 +217,7 @@ public class BaseTest {
     //TODO overload the waitForVisibility method to accept custom waiting time
     //TODO create the wait methods for intractability, presence etc.
     public void waitForVisibility(WebElement element) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(Constants.WAIT));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(Constants.WAIT));
         wait.until(ExpectedConditions.visibilityOf(element));
     }
 
@@ -209,7 +244,7 @@ public class BaseTest {
 
     public String getLabelText(WebElement e) {
         String txt = null;
-        return switch (platform) {
+        return switch (getPlatform()) {
             case "Android" -> getAttribute(e, "text");
             case "iOS" -> getAttribute(e, "label");
             default -> null;

@@ -43,10 +43,13 @@ public class TestListener implements ITestListener {
         Map<String, String> testParams = new HashMap<String, String>();
         testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
 
+        BaseTest base = new BaseTest();
+        base.setDateTime(TestUtils.getFormattedDateTime());
+
         String imagePath =  "media" + File.separator
                             + testParams.get("platformName") + "_" + testParams.get("deviceName") + File.separator
                             + "screenshots" + File.separator
-                            + TestUtils.getFormattedDateTime() + File.separator
+                            + base.getDateTime() + File.separator
                             + result.getTestClass().getRealClass().getSimpleName() + File.separator
                             + result.getName() + ".png";
 
@@ -54,7 +57,6 @@ public class TestListener implements ITestListener {
         //String completeImagePath = System.getProperty("user.dir") + File.separator + imagePath;
         String completeImagePath = Paths.get(imagePath).toAbsolutePath().toString();
 
-        BaseTest base = new BaseTest();
         File file = base.getDriver().getScreenshotAs(OutputType.FILE);
         try {
             FileUtils.copyFile(file, new File(imagePath));

@@ -72,8 +72,8 @@ public class ProductTest extends BaseTest {
         String SLBPrice = productsPage.getSLBPrice();
 
         SoftAssert sa = new SoftAssert();
-        sa.assertEquals(SLBTitle, stringsMap.get("products_page_slb_title"));
-        sa.assertEquals(SLBPrice, stringsMap.get("products_page_slb_price"));
+        sa.assertEquals(SLBTitle, getStringsMap().get("products_page_slb_title"));
+        sa.assertEquals(SLBPrice, getStringsMap().get("products_page_slb_price"));
 
         sa.assertAll();
     }
@@ -87,9 +87,9 @@ public class ProductTest extends BaseTest {
         String SLBPrice = productDetailsPage.scrollToSLBPriceAndGetSLBPrice();
 
         SoftAssert sa = new SoftAssert();
-        sa.assertEquals(SLBTitle, stringsMap.get("product_details_page_slb_title"));
-        sa.assertEquals(SLBText, stringsMap.get("product_details_page_slb_txt"));
-        sa.assertEquals(SLBPrice, stringsMap.get("product_details_page_slb_price"));
+        sa.assertEquals(SLBTitle, getStringsMap().get("product_details_page_slb_title"));
+        sa.assertEquals(SLBText, getStringsMap().get("product_details_page_slb_txt"));
+        sa.assertEquals(SLBPrice, getStringsMap().get("product_details_page_slb_price"));
 
         productsPage = productDetailsPage.pressBackToProductsBtn(); //navigate back to products list
         sa.assertAll();
