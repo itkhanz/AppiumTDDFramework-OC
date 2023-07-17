@@ -45,16 +45,16 @@ public class LoginTest extends BaseTest {
 
     @BeforeMethod
     public void beforeMethod(Method m) {
-        System.out.println(".....LoginTest before method.....");
+        //testUtils.log().info(".....LoginTest before method.....");
         closeApp();
         launchApp();
-        System.out.println("\n" + "****** starting test:" + m.getName() + "******" + "\n");
+        testUtils.log().info("****** starting test:" + m.getName() + "******");
         loginPage = new LoginPage();
     }
 
     @AfterMethod()
     public void afterMethod(){
-        System.out.println(".....LoginTest after method.....");
+        testUtils.log().info(".....LoginTest after method.....");
     }
 
     @Test
@@ -67,7 +67,9 @@ public class LoginTest extends BaseTest {
 
         String actualErrTxt = loginPage.getErrTxt();
         String expectedErrTxt = getStringsMap().get("err_invalid_username_or_password");
-        System.out.println("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
+        //testUtils.log().info("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
+        testUtils.log().info("actual error text - " + actualErrTxt);
+        testUtils.log().info("expected error text - " + expectedErrTxt);
 
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
@@ -82,7 +84,8 @@ public class LoginTest extends BaseTest {
 
         String actualErrTxt = loginPage.getErrTxt();
         String expectedErrTxt = getStringsMap().get("err_invalid_username_or_password");
-        System.out.println("actual error text - " + actualErrTxt + "\n" + "expected error text - " + expectedErrTxt);
+        testUtils.log().info("actual error text - " + actualErrTxt);
+        testUtils.log().info("expected error text - " + expectedErrTxt);
 
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
@@ -97,7 +100,8 @@ public class LoginTest extends BaseTest {
 
         String actualProductTitle = productsPage.getTitle();
         String expectedProductTitle = getStringsMap().get("product_title");
-        System.out.println("actual product title - " + actualProductTitle + "\n" + "expected title - " + expectedProductTitle);
+        testUtils.log().info("actual product title - " + actualProductTitle);
+        testUtils.log().info("expected product title - " + expectedProductTitle);
 
         Assert.assertEquals(actualProductTitle, expectedProductTitle);
     }

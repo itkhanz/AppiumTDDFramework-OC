@@ -536,7 +536,204 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 ### Log4j2 Logging framework integration
 
+> Appium will not output the appium server logs in console.
+
+* Please refer to the PDF `doc/Log4j.pdf` to see the details for log4j logging.
+*  Integrate log4j with basic configuration and output application logs to console
+*  Use multiple appenders to output logs to console as well as to file
+*  Overwriting/appending log files
+*  Setting maximum log file size/deleting old logs
+* To include Log4j2, include below maven dependencies.
+```xml
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>2.20.0</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-api</artifactId>
+    <version>2.20.0</version>
+</dependency>
+```
+
+* Create log4j2.properties or `log4j2.xml` file under `src/main/resources` folder. This file defines all the required
+  configurations like loggers, appenders, layouts, etc. in the form of key value pair.
+* Add the line in BaseTest.class `static Logger log = LogManager.getLogger(BaseTest.class.getName());`
+* ALL < DEBUG < INFO < WARN < ERROR < FATAL < OFF . Default log level is error.
+* `log.error("This is error message");` will print:
+`15:51:21.428 [TestNG-tests-1] ERROR com.itkhanz.BaseTest - This is error message`
+* To change the log level, and format the output we can define our custom logging configuration in `log4j2.properties`:
+```properties
+status = error
+dest = err
+name = PropertiesConfig
+
+appender.console.type = Console
+appender.console.name = STDOUT
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c{1}:%L %m%n
+
+logger.app.name = com.itkhanz
+logger.app.level = debug
+logger.app.additivity = false
+logger.app.appenderRef.stdout.ref = STDOUT
+
+rootLogger.level = info
+rootLogger.appenderRef.stdout.ref = STDOUT
+```
+* Any message at the `debug` level and below will be printed to console. 
+* Now the log output will look like this:
+```text
+[ERROR] 2023-07-17 16:17:22.888 BaseTest:110 This is error message
+[WARN ] 2023-07-17 16:17:22.899 BaseTest:111 This is warning message
+[INFO ] 2023-07-17 16:17:22.900 BaseTest:112 This is info message
+[DEBUG] 2023-07-17 16:17:22.900 BaseTest:113 This is debug message
+```
+
+* if you want to output to the file as well, then add another appender to the `log4j2.properties` file.
+* By default, log4j will append to any existing log file. But you can also overwrite the logs with `appender.file.append = false`.
+* For every appender, there should be a logger. In this case, since we want to write to the file at same level, we can use the same logger.
+```properties
+#log4j
+status = error
+dest = err
+name = PropertiesConfig
+
+#console appender
+appender.console.type = Console
+appender.console.name = STDOUT
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n
+
+#file appender
+appender.file.type = File
+appender.file.name = FILE
+appender.file.fileName = logs/application.log
+appender.file.layout.type = PatternLayout
+appender.file.layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n
+appender.file.append = false
+
+#logger
+logger.app.name = com.itkhanz
+logger.app.level = debug
+logger.app.additivity = false
+logger.app.appenderRef.console.ref = STDOUT
+logger.app.appenderRef.file.ref = FILE
+
+#rootLogger
+rootLogger.level = info
+rootLogger.appenderRef.stdout.ref = STDOUT
+```
+
+* if you want to delete the log file after certain duration, or after a certain maximum file size then you can
+  use `ROLLINGFILE` appender instead of `FILE` appender.
+* This will create the folder with a date, and create file with e.g. application-2023-07-17-1.log, and if file size is
+  reached on the same day, then it will create next file e.g. application-2023-07-17-1.log
+* On the next day, it will create another folder with a new date, and create the application log file in similar manner
+  inside that folder.
+* The maximum size for log file is 1KB, so a new file is created after this size is reached.
+  * After reaching the max file size, it will create the new folder with defined pattern, and move th folder logs to
+    this new folder from application.logs
+  * If the size limit is hit again, it will repeat the above procedure and create another log file.
+  * This is known as rolling mechanism.
+* It will delete the log files that are older than 10 days.
+* Below properties file demonstrate the above settings:
+```properties
+#log4j
+status = error
+dest = err
+name = PropertiesConfig
+
+#console appender
+appender.console.type = Console
+appender.console.name = STDOUT
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n
+
+# Rolling appender
+appender.rolling.type = RollingFile
+appender.rolling.name = ROLLINGFILE
+appender.rolling.fileName = logs/application.log
+appender.rolling.filePattern = logs/$${date:yyyy-MM-dd}/application-%d{yyyy-MM-dd}-%i.log
+appender.rolling.layout.type = PatternLayout
+appender.rolling.layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n
+appender.rolling.policies.type = Policies
+appender.rolling.policies.time.type = TimeBasedTriggeringPolicy
+appender.rolling.policies.size.type = SizeBasedTriggeringPolicy
+appender.rolling.policies.size.size=1KB
+appender.rolling.strategy.type = DefaultRolloverStrategy
+appender.rolling.strategy.max = 10
+
+#logger
+logger.app.name = com.itkhanz
+logger.app.level = debug
+logger.app.additivity = false
+logger.app.appenderRef.console.ref = STDOUT
+logger.app.appenderRef.file.ref = ROLLINGFILE
+
+#rootLogger
+rootLogger.level = info
+rootLogger.appenderRef.stdout.ref = STDOUT
+```
+
+* This is how logs will look like. After 1KB max size is reached, it will move the older logs to within a folder.
+
+<img src="doc/rolling-logs.png">
+
+* Equivalent `log4j2.xml` file for above properties file will look like as below.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="ERROR">
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L - %m%n"/>
+        </Console>
+            <RollingFile
+                    name="ROLLINGFILE"
+                    fileName="logs/application.log"
+                    filePattern="logs/$${date:yyyy-MM-dd}/application-%d{yyyy-MM-dd}-%i.log">
+                <PatternLayout>
+                    <Pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n</Pattern>
+                </PatternLayout>
+                <Policies>
+                    <TimeBasedTriggeringPolicy />
+                    <SizeBasedTriggeringPolicy size="1KB" />
+                </Policies>
+                <DefaultRolloverStrategy max="5" />
+            </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.itkhanz" level="debug" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="ROLLINGFILE"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+* Based on your preferences, you can either use `log4j2.properties` file or `log4j2.xml` file
+* In order to use log4j in all the classes, you need to add `static Logger log = LogManager.getLogger(CLASS.getName());` in all the classes.
+* Another ways is to create a common method in `TestUtils` class:
+```java
+    public Logger log() {
+		return LogManager.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
+	}
+```
+* Update all the `testUtils.log()` statements with `testUtils.log().info()`
+* Notice that currently log file name is not dynamic, and it will not support parallel execution also.
+* We would ideally want to create the log file name dynamically based on the device properties from the test.
+
 ### Log4j2 - Logging in multi-threaded environment (parallel execution)
+* In this section we will look at:
+  * Output logs to separate files in case of parallel execution. We will generate
+    one log file for each device. The log file name and directory structure will be
+    generated at run time based on the device parameters just like the way we did
+    for screenshots and videos.
+* 
 
 ### Start Appium server programmatically
 

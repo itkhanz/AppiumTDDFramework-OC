@@ -1,6 +1,8 @@
 package com.itkhanz.utils;
 
 import com.itkhanz.BaseTest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,5 +47,10 @@ public class TestUtils {
         PrintWriter printWriter = new PrintWriter(fileWriter);
         printWriter.println(msg);
         printWriter.close();
+    }
+
+    //TODO create a logger interface and implementation class instead of this way
+    public Logger log() {
+        return LogManager.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
     }
 }

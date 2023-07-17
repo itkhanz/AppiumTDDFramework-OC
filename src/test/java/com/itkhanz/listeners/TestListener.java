@@ -38,7 +38,7 @@ public class TestListener implements ITestListener {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             result.getThrowable().printStackTrace(pw);  //prints the entire stacktrace to testng results
-            testUtils.log(sw.toString());  //prints the stacktrace to console
+            testUtils.log().info(sw.toString());  //prints the stacktrace to console
         }
 
         //Screenshot capture and save to formatted imagePath
@@ -67,7 +67,7 @@ public class TestListener implements ITestListener {
             Reporter.log("<a href='"+ completeImagePath + "'> <img src='"+ completeImagePath + "' th:src='"+ completeImagePath + "' height='400' width='150'/> </a>");
         } catch (IOException e) {
             e.printStackTrace();
-            testUtils.log("Failed to save the screenshot");
+            testUtils.log().info("Failed to save the screenshot");
         }
     }
 

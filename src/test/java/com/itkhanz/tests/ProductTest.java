@@ -50,10 +50,10 @@ public class ProductTest extends BaseTest {
 
     @BeforeMethod
     public void beforeMethod(Method m) {
-        testUtils.log(".....ProductTest before method.....");
+        //testUtils.log().info(".....ProductTest before method.....");
         closeApp();
         launchApp();
-        testUtils.log("\n" + "****** starting test:" + m.getName() + "******" + "\n");
+        testUtils.log().info("****** starting test:" + m.getName() + "******");
         loginPage = new LoginPage();
         productsPage = loginPage.login(
                 loginUsersObject.getJSONObject("validUser").getString("username"),
@@ -63,7 +63,7 @@ public class ProductTest extends BaseTest {
 
     @AfterMethod
     public void afterMethod() {
-        testUtils.log(".....ProductTest after method.....");
+        testUtils.log().info(".....ProductTest after method.....");
         settingsPage = productsPage.pressSettingsBtn(); //open the sidebar
         loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
     }

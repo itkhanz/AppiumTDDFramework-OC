@@ -58,19 +58,19 @@ public class ProductDetailsPage extends MenuPage{
 
     public String getSLBTitle() {
         String title = getLabelText(SLBTitle);
-        testUtils.log("SLB title on DetailsPage is: " + title);
+        testUtils.log().info("SLB title on DetailsPage is: " + title);
         return title;
     }
 
     public String getSLBTxt() {
         String txt = getLabelText(SLBTxt);
-        testUtils.log("SLB text on DetailsPage is: " + txt);
+        testUtils.log().info("SLB text on DetailsPage is: " + txt);
         return txt;
     }
 
     public ProductsPage pressBackToProductsBtn() {
         click(backToProductsBtn);
-        testUtils.log("Navigating back to products page");
+        testUtils.log().info("Navigating back to products page");
         return new ProductsPage();
     }
 

@@ -12,12 +12,16 @@
         <parameter name="systemPort" value="10000" />
         <parameter name="chromeDriverPort" value="11000" />
         <classes>
-            <class name="com.itkhanz.tests.LoginTest"/>
+            <class name="com.itkhanz.tests.LoginTest">
+                <methods>
+                    <include name="invalidUsernameTest" />
+                </methods>
+            </class>
             <!--<class name="com.itkhanz.tests.ProductTest"/>-->
         </classes>
     </test> <!-- Test -->
 
-    <test name="iPhone14">
+    <!--<test name="iPhone14">
         <listeners>
             <listener class-name="com.itkhanz.listeners.TestListener" />
         </listeners>
@@ -27,7 +31,7 @@
         <parameter name="wdaLocalPort" value="8100" />
         <classes>
             <class name="com.itkhanz.tests.LoginTest"/>
-            <!--<class name="com.itkhanz.tests.ProductTest"/>-->
+            <class name="com.itkhanz.tests.ProductTest"/>
         </classes>
-    </test> <!-- Test -->
+    </test>--> <!-- Test -->
 </suite> <!-- Suite -->

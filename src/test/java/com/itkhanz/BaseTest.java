@@ -12,6 +12,8 @@ import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -38,7 +40,6 @@ public class BaseTest {
     protected static ThreadLocal<HashMap<String, String>> stringsMap = new ThreadLocal<HashMap<String, String>>();
     protected static ThreadLocal<String>  platform = new ThreadLocal<String>();
     protected static ThreadLocal<String>  device = new ThreadLocal<String>();
-
     public static ThreadLocal<String> dateTime = new ThreadLocal<String>();
 
     TestUtils testUtils = new TestUtils();
@@ -167,7 +168,7 @@ public class BaseTest {
             }
 
             String sessionID = driver.getSessionId().toString();
-            testUtils.log("Appium Driver is initialized with session id: " + sessionID);
+            testUtils.log().info("Appium Driver is initialized with session id: " + sessionID);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -188,14 +189,14 @@ public class BaseTest {
 
     @BeforeMethod
     public void beforeMethodBase() {
-        testUtils.log(".....super before method.....");
+        //testUtils.log().info(".....super before method.....");
         ((CanRecordScreen) getDriver()).startRecordingScreen();
     }
 
     //stop video capturing and create *.mp4 file
     @AfterMethod
     public synchronized void afterMethodBase(ITestResult result) throws IOException {
-        testUtils.log(".....super after method.....");
+        //testUtils.log().info(".....super after method.....");
         String media = ((CanRecordScreen) getDriver()).stopRecordingScreen();
 
         Map<String, String> testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
@@ -222,9 +223,9 @@ public class BaseTest {
             stream = new FileOutputStream(videoDir + File.separator + result.getName() + ".mp4");
             stream.write(Base64.decodeBase64(media));
             stream.close();
-            testUtils.log("video path: " + videoDir + File.separator + result.getName() + ".mp4");
+            testUtils.log().info("video path: " + videoDir + File.separator + result.getName() + ".mp4");
         } catch (Exception e) {
-            testUtils.log("error during video capture" + e.toString());
+            testUtils.log().info("error during video capture" + e.toString());
         } finally {
             if(stream != null) {
                 stream.close();
