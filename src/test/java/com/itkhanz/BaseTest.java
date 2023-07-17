@@ -86,6 +86,7 @@ public class BaseTest {
         AppiumDriver driver;
 
         setPlatform(platformName); //we declared platform as protected class variable because we need this info in test cases
+        setDateTime(TestUtils.getFormattedDateTime());
         try {
             String xmlFileName = "strings/strings.xml";
             stringsStream = getClass().getClassLoader().getResourceAsStream(xmlFileName);
@@ -165,7 +166,7 @@ public class BaseTest {
 
     //stop video capturing and create *.mp4 file
     @AfterMethod
-    public void afterMethodBase(ITestResult result) throws IOException {
+    public synchronized void afterMethodBase(ITestResult result) throws IOException {
         System.out.println(".....super after method.....");
         String media = ((CanRecordScreen) getDriver()).stopRecordingScreen();
 
@@ -173,6 +174,7 @@ public class BaseTest {
 
         //TODO datetime will be different this time because the sceeenshot is captured in listener which executes before this  method which causes few seconds difference so separatte folder is getting created for videos
         //TODO sync the time for both screenshots and videos so both are created under single timestamp
+        //TODO above issue is possibly resolved becasue of threadlocal dateTime
         String dirPath =  "media" + File.separator
                 + testParams.get("platformName") + "_" + testParams.get("deviceName") + File.separator
                 + "videos" + File.separator
@@ -181,9 +183,12 @@ public class BaseTest {
                 ;
 
         File videoDir = new File(dirPath);
-        if(!videoDir.exists()) {
-            videoDir.mkdirs();
+        synchronized(videoDir) {
+            if (!videoDir.exists()) {
+                videoDir.mkdirs();
+            }
         }
+
         FileOutputStream stream = null;
         try {
             stream = new FileOutputStream(videoDir + File.separator + result.getName() + ".mp4");

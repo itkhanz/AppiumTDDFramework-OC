@@ -44,7 +44,8 @@ public class TestListener implements ITestListener {
         testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
 
         BaseTest base = new BaseTest();
-        base.setDateTime(TestUtils.getFormattedDateTime());
+        //If set here, then this will only be set for failed test cases
+        //base.setDateTime(TestUtils.getFormattedDateTime());
 
         String imagePath =  "media" + File.separator
                             + testParams.get("platformName") + "_" + testParams.get("deviceName") + File.separator

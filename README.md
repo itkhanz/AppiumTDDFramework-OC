@@ -476,6 +476,7 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 * First we change the class level global variables to ThreadLocal
 * No we need to remove class level references to global variables, and instead use getters and setters.
+* In case of race-condition between two threads, we can apply synchronization provided by Java to sync either the full method or object.
 * 
 
 ### Log4j2 Logging framework integration
