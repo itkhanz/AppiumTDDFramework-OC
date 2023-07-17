@@ -733,7 +733,121 @@ rootLogger.appenderRef.stdout.ref = STDOUT
     one log file for each device. The log file name and directory structure will be
     generated at run time based on the device parameters just like the way we did
     for screenshots and videos.
-* 
+* Dynamic file path or file name for logs file
+* Output logs to separate file for each thread.
+* Routing adapter and ThreadContext
+* [RoutingAppender](https://logging.apache.org/log4j/2.x/manual/appenders.html#RoutingAppender)
+* Replace the Rolling appender lines to following in `log4j2.properties` file:
+```properties
+#log4j
+status = error
+dest = err
+name = PropertiesConfig
+
+#console appender
+appender.console.type = Console
+appender.console.name = STDOUT
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n
+
+# Rolling appender
+appender.routing.type = Routing
+appender.routing.name = MyRoutingAppender
+appender.routing.routes.type = Routes
+appender.routing.routes.pattern = $${ctx:ROUTINGKEY}
+appender.routing.routes.route.type = Route
+
+appender.routing.routes.route.rolling.type = RollingFile
+appender.routing.routes.route.rolling.name = ROLLINGFILE
+appender.routing.routes.route.rolling.fileName = ${ctx:ROUTINGKEY}/application.log
+appender.routing.routes.route.rolling.filePattern = ${ctx:ROUTINGKEY}/$${date:yyyy-MM-dd}/application-%d{yyyy-MM-dd}-%i.log
+appender.routing.routes.route.rolling.layout.type = PatternLayout
+appender.routing.routes.route.rolling.layout.pattern = [${ctx:ROUTINGKEY} %-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L %m%n
+appender.routing.routes.route.rolling.policies.type = Policies
+appender.routing.routes.route.rolling.policies.time.type = TimeBasedTriggeringPolicy
+appender.routing.routes.route.rolling.policies.size.type = SizeBasedTriggeringPolicy
+appender.routing.routes.route.rolling.policies.size.size=1KB
+appender.routing.routes.route.rolling.strategy.type = DefaultRolloverStrategy
+appender.routing.routes.route.rolling.strategy.max = 10
+
+#logger
+logger.app.name = com.itkhanz
+logger.app.level = debug
+logger.app.additivity = false
+logger.app.appenderRef.console.ref = STDOUT
+logger.app.appenderRef.file.ref = MyRoutingAppender
+
+#rootLogger
+rootLogger.level = info
+rootLogger.appenderRef.stdout.ref = STDOUT
+
+```
+* The value for the `ROUTINGKEY` can be assigned at runtime using ThreadContext class from log4j.
+* We replaced the fileName and filePattern `logs/` parent folder to `${ctx:ROUTINGKEY}/`, so depending on the value of ROUTINGKEY variable, the file path will be set accordingly.
+* We changed the rolling file appender to use the routing appender.
+* Also in the logger, we change the reference from rolling file appender to routing appender.
+* Now in the code, we need to assign the ROUTINGKEY value using ThreadContext class. We added this snippet in BaseTest
+  class, since this is the starting point for our test executions. This value will be different for each thread.
+* This means that the value for ROUTINGKEY will be substituted at the run time, and the routing appender will use that value to define the file path for rolling file appender.
+* ROUTINGKEY is just a variable and could be any name. Be sure to use the same name throughout.
+
+```java
+        String strFile = "logs" + File.separator + platformName + "_" + deviceName;
+        File logFile = new File(strFile);
+        if (!logFile.exists()) {
+            logFile.mkdirs();
+        }
+        //route logs to separate file for each thread
+        ThreadContext.put("ROUTINGKEY", strFile);
+        testUtils.log().info("log path: " + strFile);
+```
+* We can use the same configurations with `log4j2xml`:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="ERROR">
+  <Appenders>
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c:%L - %m%n"/>
+    </Console>
+    <Routing name="MyRoutingAppender">
+      <Routes pattern="$${ctx:ROUTINGKEY}">
+        <Route>
+    		<RollingFile
+    			name="appender-${ctx:ROUTINGKEY}"
+    			fileName="${ctx:ROUTINGKEY}/application.log"
+    			filePattern="${ctx:ROUTINGKEY}/$${date:yyyy-MM-dd}/application-%d{yyyy-MM-dd}-%i.log">
+    			<PatternLayout>
+        			<Pattern>[${ctx:ROUTINGKEY} %-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %c{1}:%L - %m%n</Pattern>
+    			</PatternLayout>
+    			<Policies>
+        			<TimeBasedTriggeringPolicy />
+        			<SizeBasedTriggeringPolicy size="10MB" />
+    			</Policies>
+    			<DefaultRolloverStrategy max="5" />
+			</RollingFile>
+        </Route>
+      </Routes>
+    </Routing>
+  </Appenders>
+  <Loggers>
+    <Logger name="com.itkhanz" level="debug" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="MyRoutingAppender"/>
+    </Logger>
+    <Root level="info">
+      <AppenderRef ref="STDOUT"/>
+    </Root>
+  </Loggers>
+</Configuration>
+```
+
+> Important! The name of the package in `<Logger name ="PACKAGE">` must be same as in your project
+
+* In case of web automation, we can replace the device name with browser name.
+
+<img src="doc/logs-folder-structure.png" width="302">
+
+<img src="doc/logs-file-output.png" width="900">
 
 ### Start Appium server programmatically
 

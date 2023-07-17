@@ -12,8 +12,7 @@ import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -101,6 +100,15 @@ public class BaseTest {
         InputStream stringsStream = null;
         Properties props = new Properties();
         AppiumDriver driver;
+
+        String strFile = "logs" + File.separator + platformName + "_" + deviceName;
+        File logFile = new File(strFile);
+        if (!logFile.exists()) {
+            logFile.mkdirs();
+        }
+        //route logs to separate file for each thread
+        ThreadContext.put("ROUTINGKEY", strFile);
+        testUtils.log().info("log path: " + strFile);
 
         setPlatform(platformName); //we declared platform as protected class variable because we need this info in test cases
         setDevice(deviceName);
