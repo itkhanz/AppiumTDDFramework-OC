@@ -32,7 +32,7 @@ public class ProductTest extends BaseTest {
         //TODO parse test data using Google GSON library
         //TODO use Optional in java to check for null
         InputStream loginDetails = null;
-        
+
         try {
             loginDetails = getClass().getClassLoader().getResourceAsStream(Constants.dataFileName);
             JSONTokener tokener = new JSONTokener(loginDetails);

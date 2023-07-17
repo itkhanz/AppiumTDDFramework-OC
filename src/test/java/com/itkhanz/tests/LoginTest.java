@@ -72,7 +72,7 @@ public class LoginTest extends BaseTest {
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
 
-    @Test(enabled = false)
+    @Test
     public void invalidPasswordTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file
@@ -87,7 +87,7 @@ public class LoginTest extends BaseTest {
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
 
-    @Test(enabled = false)
+    @Test
     public void successfulLoginTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file

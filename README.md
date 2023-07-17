@@ -436,7 +436,17 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
   * Atomic tests - each test case should run independently
 
 * [Parallel tests documentation](https://appium.readthedocs.io/en/stable/en/advanced-concepts/parallel-tests/)
-  [Appium Parallel Execution Docs](https://github.com/appium/appium/blob/1.x/docs/en/advanced-concepts/parallel-tests.md)
+* [Appium Parallel Execution Docs](https://github.com/appium/appium/blob/1.x/docs/en/advanced-concepts/parallel-tests.md)
+* [Automating hybrid apps](https://appium.readthedocs.io/en/stable/en/writing-running-appium/web/hybrid/)
+  * `webkitDebugProxyPort` capability and `ios-webkit-debug-proxy` is not required as of latest appium 2.0.
+  * When executing against an iOS real device, Appium is unable to access the web view directly. Therefore the connection
+    has to be established through the USB cable.Appium can establish the connection natively since version 1.15
+    via [appium-ios-device](https://github.com/appium/appium-ios-device
+  * Before you can run your tests against Safari on a real device you will need to:
+    * Turn on web inspector on iOS device (settings > safari > advanced)
+  * https://github.com/appium/appium/issues/16486
+  * https://github.com/appium/appium/issues/16494
+  * https://github.com/appium/appium/pull/16824
 
 <img src="doc/parallel-execution-option-1.png" width="900">
 
@@ -466,10 +476,6 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 <img src="doc/logs.png" width="900">
 
-* Possible issues:
-  * [iOS13: Sometimes driver fails to start with busy port problem](https://github.com/appium/appium/issues/13452)
-  * [https://github.com/testng-team/testng/issues/2243](https://github.com/testng-team/testng/issues/2243)
-  
 * Now we will make the desired changes to framework that will support parallel execution for upto 4 devices:
 
 <img src="doc/parallel-execution-devices.png" width="900">
@@ -477,6 +483,18 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 * First we change the class level global variables to ThreadLocal
 * No we need to remove class level references to global variables, and instead use getters and setters.
 * In case of race-condition between two threads, we can apply synchronization provided by Java to sync either the full method or object.
+* We also need to move class level objects to methods
+* We also need to add the capability for each of the platforms and change testng.xml
+* Start the 2 instances of appium server on different ports:
+  * appium -p 4723 --use-drivers=uiautomator2
+  * appium -p 4724 --use-drivers=xcuitest
+* Now we can run the tests in parallel on both android and ios
+
+<img src="doc/parallel-emulator-simulator.png" width="900">
+
+
+<img src="doc/parallel-html-report.png" width="900">
+
 * 
 
 ### Log4j2 Logging framework integration

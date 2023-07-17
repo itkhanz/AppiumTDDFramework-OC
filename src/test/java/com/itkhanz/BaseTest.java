@@ -18,6 +18,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
+import org.testng.annotations.Optional;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -77,9 +78,13 @@ public class BaseTest {
         PageFactory.initElements(new AppiumFieldDecorator(getDriver()),this);
     }
 
-    @Parameters({"platformName", "deviceName", "udid"})
+    @Parameters({"platformName", "udid", "deviceName", "emulator", "systemPort", "chromeDriverPort", "wdaLocalPort"})
     @BeforeTest
-    public void setup(String platformName, String deviceName, String udid) throws Exception{
+    public void setup(String platformName, String udid, String deviceName,
+                      @Optional("androidOnly")String emulator,
+                      @Optional("10000")String systemPort,
+                      @Optional("11000")String chromeDriverPort,
+                      @Optional("8100")String wdaLocalPort) throws Exception{
         InputStream configStream = null;
         InputStream stringsStream = null;
         Properties props = new Properties();
@@ -98,7 +103,6 @@ public class BaseTest {
             setProps(props);
 
             try {
-                URL url = new URL(props.getProperty("appiumURL"));
                 switch (platformName) {
                     case "Android" -> {
                         //get the complete path of the app on local machine (it will append the root path with the property)
@@ -112,8 +116,15 @@ public class BaseTest {
                                 .setAppActivity(getProps().getProperty("androidAppActivity"))
                                 //.setApp(appURL) //not needed when app is pre-installed
                                 .setAppWaitActivity(getProps().getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
-                                //.setAvd(deviceName)  //hw device name of emulator e.g. Pixel_5, it automatically opens up the emulator
+                                .setSystemPort(Integer.parseInt(systemPort))
+                                .setChromedriverPort(Integer.parseInt(chromeDriverPort))
                                 ;
+
+                        /*if (emulator.equalsIgnoreCase("true")) {
+                            options.setAvd(deviceName) ; //hw device name of emulator e.g. Pixel_5, it automatically opens up the emulator
+                        }*/
+
+                        URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("androidPort"));
                         driver = new AndroidDriver(url, options);
                     }
                     case "iOS" -> {
@@ -127,7 +138,9 @@ public class BaseTest {
                                 .setBundleId(getProps().getProperty("iOSBundleId")) //not needed with appUrl
                                 //.setApp(appURL) //not needed when app is pre-installed
                                 .setUsePrebuiltWda(true)    //speeds up the test execution if WDA is already on the device
+                                .setWdaLocalPort(Integer.parseInt(wdaLocalPort))
                                 ;
+                        URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("iosPort"));
                         driver = new IOSDriver(url, options);
                     }
                     default -> throw new RuntimeException("Inavlid platform! - " + platformName);

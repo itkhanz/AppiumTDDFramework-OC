@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suite name="Swag Labs Demo App Suite" parallel="false" configfailurepolicy="continue">
-    <listeners>
-        <listener class-name="com.itkhanz.listeners.TestListener" />
-    </listeners>
+<suite name="Swag Labs Demo App Suite" parallel="tests" thread-count="2" configfailurepolicy="continue">
 
     <test name="Pixel_5">
+        <listeners>
+            <listener class-name="com.itkhanz.listeners.TestListener" />
+        </listeners>
         <parameter name="platformName" value="Android" />
         <parameter name="deviceName" value="Pixel_5" />
         <parameter name="udid" value="emulator-5554" />
+        <parameter name="emulator" value="true" />
+        <parameter name="systemPort" value="10000" />
+        <parameter name="chromeDriverPort" value="11000" />
         <classes>
             <class name="com.itkhanz.tests.LoginTest"/>
-            <class name="com.itkhanz.tests.ProductTest"/>
+            <!--<class name="com.itkhanz.tests.ProductTest"/>-->
         </classes>
     </test> <!-- Test -->
 
-    <!--<test name="iPhone14">
+    <test name="iPhone14">
+        <listeners>
+            <listener class-name="com.itkhanz.listeners.TestListener" />
+        </listeners>
         <parameter name="platformName" value="iOS" />
         <parameter name="deviceName" value="iPhone 14" />
         <parameter name="udid" value="1E8FE39B-1118-4117-B02B-66A390AECB3F" />
+        <parameter name="wdaLocalPort" value="8100" />
         <classes>
             <class name="com.itkhanz.tests.LoginTest"/>
-            <class name="com.itkhanz.tests.ProductTest"/>
+            <!--<class name="com.itkhanz.tests.ProductTest"/>-->
         </classes>
-    </test>--> <!-- Test -->
+    </test> <!-- Test -->
 </suite> <!-- Suite -->
