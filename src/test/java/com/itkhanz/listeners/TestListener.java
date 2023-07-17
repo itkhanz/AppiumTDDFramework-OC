@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestListener implements ITestListener {
+    TestUtils testUtils = new TestUtils();
+
     @Override
     public void onTestStart(ITestResult result) {
         ITestListener.super.onTestStart(result);
@@ -36,7 +38,7 @@ public class TestListener implements ITestListener {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             result.getThrowable().printStackTrace(pw);  //prints the entire stacktrace to testng results
-            System.out.println(sw.toString());  //prints the stacktrace to console
+            testUtils.log(sw.toString());  //prints the stacktrace to console
         }
 
         //Screenshot capture and save to formatted imagePath
@@ -65,7 +67,7 @@ public class TestListener implements ITestListener {
             Reporter.log("<a href='"+ completeImagePath + "'> <img src='"+ completeImagePath + "' th:src='"+ completeImagePath + "' height='400' width='150'/> </a>");
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Failed to save the screenshot");
+            testUtils.log("Failed to save the screenshot");
         }
     }
 

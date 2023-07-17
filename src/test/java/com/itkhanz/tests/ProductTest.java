@@ -6,6 +6,7 @@ import com.itkhanz.pages.LoginPage;
 import com.itkhanz.pages.ProductDetailsPage;
 import com.itkhanz.pages.ProductsPage;
 import com.itkhanz.pages.SettingsPage;
+import com.itkhanz.utils.TestUtils;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.testng.Assert;
@@ -24,8 +25,8 @@ public class ProductTest extends BaseTest {
     ProductsPage productsPage;
     SettingsPage settingsPage;
     ProductDetailsPage productDetailsPage;
-
     JSONObject loginUsersObject;
+    TestUtils testUtils = new TestUtils();
 
     @BeforeClass
     public void beforeClass() {
@@ -49,10 +50,10 @@ public class ProductTest extends BaseTest {
 
     @BeforeMethod
     public void beforeMethod(Method m) {
-        System.out.println(".....ProductTest before method.....");
+        testUtils.log(".....ProductTest before method.....");
         closeApp();
         launchApp();
-        System.out.println("\n" + "****** starting test:" + m.getName() + "******" + "\n");
+        testUtils.log("\n" + "****** starting test:" + m.getName() + "******" + "\n");
         loginPage = new LoginPage();
         productsPage = loginPage.login(
                 loginUsersObject.getJSONObject("validUser").getString("username"),
@@ -62,7 +63,7 @@ public class ProductTest extends BaseTest {
 
     @AfterMethod
     public void afterMethod() {
-        System.out.println(".....ProductTest after method.....");
+        testUtils.log(".....ProductTest after method.....");
         settingsPage = productsPage.pressSettingsBtn(); //open the sidebar
         loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
     }
@@ -79,7 +80,7 @@ public class ProductTest extends BaseTest {
         sa.assertAll();
     }
 
-    @Test (enabled = false)
+    @Test
     public void validateProductOnProductDetailsPage() {
         productDetailsPage = productsPage.pressSLBTitle();
 

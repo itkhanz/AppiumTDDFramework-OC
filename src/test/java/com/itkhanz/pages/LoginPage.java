@@ -1,11 +1,13 @@
 package com.itkhanz.pages;
 
 import com.itkhanz.BaseTest;
+import com.itkhanz.utils.TestUtils;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import org.openqa.selenium.WebElement;
 
 public class LoginPage extends BaseTest {
+    TestUtils testUtils = new TestUtils();
 
     //TODO initialize the driver from driver factory in test case, and pass it to login page which extends from base page and pass the driver to base page in constructor
     @AndroidFindBy(accessibility = "test-Username")
@@ -26,20 +28,20 @@ public class LoginPage extends BaseTest {
 
     public LoginPage enterUserName(String username) {
         clear(usernameTxtFld);  //iOS may not clear the text input field automatically when entering text
-        System.out.println("login with user: " + username);
+        testUtils.log("login with user: " + username);
         sendKeys(usernameTxtFld, username);
         return this;
     }
 
     public LoginPage enterPassword(String password) {
         clear(passwordTxtFld);
-        System.out.println("password is: " + password);
+        testUtils.log("password is: " + password);
         sendKeys(passwordTxtFld, password);
         return this;
     }
 
     public ProductsPage pressLoginBtn() {
-        System.out.println("pressing login button");
+        testUtils.log("pressing login button");
         click(loginBtn);
         return new ProductsPage();
     }
@@ -54,7 +56,7 @@ public class LoginPage extends BaseTest {
         //since text attribute does not exist for iOS, so we wrote a custom method to return text or label based on platform
         //return getAttribute(errTxt, "text");
         String err = getLabelText(errTxt);
-        System.out.println("login error text is - " + err);
+        testUtils.log("login error text is - " + err);
         return err;
     }
 }

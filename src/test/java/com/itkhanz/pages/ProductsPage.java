@@ -1,11 +1,13 @@
 package com.itkhanz.pages;
 
 import com.itkhanz.BaseTest;
+import com.itkhanz.utils.TestUtils;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import org.openqa.selenium.WebElement;
 
 public class ProductsPage extends MenuPage {
+    TestUtils testUtils = new TestUtils();
     @AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc='test-Cart drop zone']//android.widget.TextView")
     @iOSXCUITFindBy(xpath ="//XCUIElementTypeOther[@name='test-Toggle']/parent::*[1]/preceding-sibling::*[1]")
     private WebElement productTitleTxt;
@@ -21,25 +23,25 @@ public class ProductsPage extends MenuPage {
     public String getTitle() {
         //return getAttribute(productTitleTxt, "text");
         String title =  getLabelText(productTitleTxt);
-        System.out.println("product page title is - " + title);
+        testUtils.log("product page title is - " + title);
         return title;
     }
 
     public String getSLBTitle() {
         String title = getLabelText(SLBTitle);
-        System.out.println("SLB title is - " + title);
+        testUtils.log("SLB title is - " + title);
         return title;
     }
 
     public String getSLBPrice() {
         String price = getLabelText(SLBPrice);
-        System.out.println("SLB price is - " + price);
+        testUtils.log("SLB price is - " + price);
         return price;
     }
 
     public ProductDetailsPage pressSLBTitle() {
         click(SLBTitle);
-        System.out.println("Navigating to SLB Product Details page");
+        testUtils.log("Navigating to SLB Product Details page");
         return new ProductDetailsPage();
     }
 }

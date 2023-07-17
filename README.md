@@ -495,7 +495,44 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 <img src="doc/parallel-html-report.png" width="900">
 
-* 
+* The problem with the current setup is that logs foe both the tests are interlinked and we cannot determine which logs are for which device.
+* We will implement a custom method which outputs the log for each device to separate file.
+```java
+    public void log(String txt) {
+        BaseTest base = new BaseTest();
+        String msg = Thread.currentThread().getId() + ":" + base.getPlatform() + ":" + base.getDevice() + ":"
+                + Thread.currentThread().getStackTrace()[2].getClassName() + ":" + txt;
+
+        System.out.println(msg);
+
+        String strFile = "logs" + File.separator + base.getPlatform() + "_" + base.getDevice()
+                + File.separator + base.getDateTime();
+
+        File logFile = new File(strFile);
+
+        if (!logFile.exists()) {
+            logFile.mkdirs();
+        }
+
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(logFile + File.separator + "log.txt",true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        printWriter.println(msg);
+        printWriter.close();
+    }
+```
+
+* We will replace `System.out.println()` statements with our custom log method.
+* Now we will use single appium server to run tests in parallel on 1 android and 1 iOS device.
+  * `appium --use-drivers=xcuitest,uiautomator2 -p 4723`
+* Now we can see that the logs for each device are written separately
+
+<img src="doc/screenshot-custom-logs.png" width="900">
+
 
 ### Log4j2 Logging framework integration
 

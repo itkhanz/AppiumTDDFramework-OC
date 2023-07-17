@@ -1,5 +1,11 @@
 package com.itkhanz.utils;
 
+import com.itkhanz.BaseTest;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -12,5 +18,32 @@ public class TestUtils {
      */
     public static String getFormattedDateTime() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"));
+    }
+
+    public void log(String txt) {
+        BaseTest base = new BaseTest();
+        String msg = Thread.currentThread().getId() + ":" + base.getPlatform() + ":" + base.getDevice() + ":"
+                + Thread.currentThread().getStackTrace()[2].getClassName() + ":" + txt;
+
+        System.out.println(msg);
+
+        String strFile = "logs" + File.separator + base.getPlatform() + "_" + base.getDevice()
+                + File.separator + base.getDateTime();
+
+        File logFile = new File(strFile);
+
+        if (!logFile.exists()) {
+            logFile.mkdirs();
+        }
+
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(logFile + File.separator + "log.txt",true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        printWriter.println(msg);
+        printWriter.close();
     }
 }

@@ -4,6 +4,7 @@ import com.itkhanz.BaseTest;
 import com.itkhanz.constants.Constants;
 import com.itkhanz.pages.LoginPage;
 import com.itkhanz.pages.ProductsPage;
+import com.itkhanz.utils.TestUtils;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.testng.Assert;
@@ -19,9 +20,8 @@ import java.lang.reflect.Method;
 public class LoginTest extends BaseTest {
     LoginPage loginPage;
     ProductsPage productsPage;  //This object can we keep at classes level because we are not manipulating the read-data
-
-
     JSONObject loginUsersObject;
+    TestUtils testUtils = new TestUtils();
 
     @BeforeClass
     public void beforeClass() {

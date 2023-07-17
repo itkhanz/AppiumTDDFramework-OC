@@ -37,7 +37,11 @@ public class BaseTest {
     protected static ThreadLocal<Properties> props = new ThreadLocal<Properties>();
     protected static ThreadLocal<HashMap<String, String>> stringsMap = new ThreadLocal<HashMap<String, String>>();
     protected static ThreadLocal<String>  platform = new ThreadLocal<String>();
+    protected static ThreadLocal<String>  device = new ThreadLocal<String>();
+
     public static ThreadLocal<String> dateTime = new ThreadLocal<String>();
+
+    TestUtils testUtils = new TestUtils();
 
     public AppiumDriver getDriver() {
         return driver.get();
@@ -67,6 +71,13 @@ public class BaseTest {
         platform.set(pl);
     }
 
+    public String getDevice() {
+        return device.get();
+    }
+    public void setDevice(String deviceName) {
+        device.set(deviceName);
+    }
+
     public String getDateTime() {
         return dateTime.get();
     }
@@ -91,6 +102,7 @@ public class BaseTest {
         AppiumDriver driver;
 
         setPlatform(platformName); //we declared platform as protected class variable because we need this info in test cases
+        setDevice(deviceName);
         setDateTime(TestUtils.getFormattedDateTime());
         try {
             String xmlFileName = "strings/strings.xml";
@@ -103,6 +115,9 @@ public class BaseTest {
             setProps(props);
 
             try {
+                //Use this url if running single appium server
+                //if running multiple servers on different ports, then comment this, and use the url inside switch separately for both drivers
+                URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("appiumServerDefaultPort"));
                 switch (platformName) {
                     case "Android" -> {
                         //get the complete path of the app on local machine (it will append the root path with the property)
@@ -124,7 +139,7 @@ public class BaseTest {
                             options.setAvd(deviceName) ; //hw device name of emulator e.g. Pixel_5, it automatically opens up the emulator
                         }*/
 
-                        URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("androidPort"));
+                        //URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("androidPort"));
                         driver = new AndroidDriver(url, options);
                     }
                     case "iOS" -> {
@@ -140,7 +155,7 @@ public class BaseTest {
                                 .setUsePrebuiltWda(true)    //speeds up the test execution if WDA is already on the device
                                 .setWdaLocalPort(Integer.parseInt(wdaLocalPort))
                                 ;
-                        URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("iosPort"));
+                        //URL url = new URL(getProps().getProperty("appiumURL") + ":" + getProps().getProperty("iosPort"));
                         driver = new IOSDriver(url, options);
                     }
                     default -> throw new RuntimeException("Inavlid platform! - " + platformName);
@@ -152,7 +167,7 @@ public class BaseTest {
             }
 
             String sessionID = driver.getSessionId().toString();
-            System.out.println("Appium Driver is initialized with session id: " + sessionID);
+            testUtils.log("Appium Driver is initialized with session id: " + sessionID);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -173,14 +188,14 @@ public class BaseTest {
 
     @BeforeMethod
     public void beforeMethodBase() {
-        System.out.println(".....super before method.....");
+        testUtils.log(".....super before method.....");
         ((CanRecordScreen) getDriver()).startRecordingScreen();
     }
 
     //stop video capturing and create *.mp4 file
     @AfterMethod
     public synchronized void afterMethodBase(ITestResult result) throws IOException {
-        System.out.println(".....super after method.....");
+        testUtils.log(".....super after method.....");
         String media = ((CanRecordScreen) getDriver()).stopRecordingScreen();
 
         Map<String, String> testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
@@ -207,9 +222,9 @@ public class BaseTest {
             stream = new FileOutputStream(videoDir + File.separator + result.getName() + ".mp4");
             stream.write(Base64.decodeBase64(media));
             stream.close();
-            System.out.println("video path: " + videoDir + File.separator + result.getName() + ".mp4");
+            testUtils.log("video path: " + videoDir + File.separator + result.getName() + ".mp4");
         } catch (Exception e) {
-            System.out.println("error during video capture" + e.toString());
+            testUtils.log("error during video capture" + e.toString());
         } finally {
             if(stream != null) {
                 stream.close();

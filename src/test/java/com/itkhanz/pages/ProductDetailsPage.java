@@ -1,5 +1,6 @@
 package com.itkhanz.pages;
 
+import com.itkhanz.utils.TestUtils;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.InteractsWithApps;
 import io.appium.java_client.pagefactory.AndroidFindBy;
@@ -10,6 +11,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import java.util.HashMap;
 
 public class ProductDetailsPage extends MenuPage{
+    TestUtils testUtils = new TestUtils();
     @AndroidFindBy(xpath = "//android.view.ViewGroup[@content-desc='test-Description']/android.widget.TextView[1]")
     @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='test-Description']/child::XCUIElementTypeStaticText[1]")
     private WebElement SLBTitle;
@@ -56,19 +58,19 @@ public class ProductDetailsPage extends MenuPage{
 
     public String getSLBTitle() {
         String title = getLabelText(SLBTitle);
-        System.out.println("SLB title on DetailsPage is: " + title);
+        testUtils.log("SLB title on DetailsPage is: " + title);
         return title;
     }
 
     public String getSLBTxt() {
         String txt = getLabelText(SLBTxt);
-        System.out.println("SLB text on DetailsPage is: " + txt);
+        testUtils.log("SLB text on DetailsPage is: " + txt);
         return txt;
     }
 
     public ProductsPage pressBackToProductsBtn() {
         click(backToProductsBtn);
-        System.out.println("Navigating back to products page");
+        testUtils.log("Navigating back to products page");
         return new ProductsPage();
     }
 
