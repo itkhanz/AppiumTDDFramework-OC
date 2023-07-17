@@ -18,15 +18,17 @@ import java.lang.reflect.Method;
 
 public class LoginTest extends BaseTest {
     LoginPage loginPage;
-    ProductsPage productsPage;
+    ProductsPage productsPage;  //This object can we keep at classes level because we are not manipulating the read-data
 
-    InputStream loginDetails;
+
     JSONObject loginUsersObject;
 
     @BeforeClass
     public void beforeClass() {
         //TODO parse test data using Google GSON library
         //TODO use Optional in java to check for null
+        InputStream loginDetails = null;
+
         try {
             loginDetails = getClass().getClassLoader().getResourceAsStream(Constants.dataFileName);
             JSONTokener tokener = new JSONTokener(loginDetails);
