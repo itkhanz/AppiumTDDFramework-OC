@@ -538,6 +538,16 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 > Appium will not output the appium server logs in console.
 
+* Reading resources:
+  * [Log4j2 - HowToDoInJava](https://howtodoinjava.com/log4j2/)
+  * [Log4j2 - Baeldung](https://www.baeldung.com/tag/log4j2)
+  * [Log4j 2 Configuration Example - sematext](https://sematext.com/blog/log4j2-tutorial/)
+  * [Apache Log4j2](https://logging.apache.org/log4j/2.x/)
+  * [Apache Log4j2 Java API](https://logging.apache.org/log4j/2.x/manual/api.html)
+  * [Apache Log4j2 Appenders](https://logging.apache.org/log4j/2.x/manual/appenders.html)
+  * [Apache Log4j2 Pattern Layout](https://logging.apache.org/log4j/2.x/manual/layouts.html#PatternLayout)
+  * [Apache Log4j2 ThreadContext](https://logging.apache.org/log4j/2.x/manual/thread-context.html)
+  * [Apache Log4j2 Separate Log Files](https://logging.apache.org/log4j/2.x/faq.html#separate_log_files)
 * Please refer to the PDF `doc/Log4j.pdf` to see the details for log4j logging.
 *  Integrate log4j with basic configuration and output application logs to console
 *  Use multiple appenders to output logs to console as well as to file
@@ -848,6 +858,102 @@ rootLogger.appenderRef.stdout.ref = STDOUT
 <img src="doc/logs-folder-structure.png" width="302">
 
 <img src="doc/logs-file-output.png" width="900">
+
+#### Use SLF4J with Log4J2
+
+<img src="doc/slf4j.png">
+
+* Reading resources:
+  * [Log4j2 with SLF4J Configuration - HowToDoInJava](https://howtodoinjava.com/log4j2/log4j2-with-slf4j/)
+  * [SLF4j Vs Log4j – Which One is Better? - HowToDoInJava](https://howtodoinjava.com/log4j2/slf4j-vs-log4j-which-one-is-better/)
+  * [SLF4J - Baeldung](https://www.baeldung.com/tag/slf4j)
+  * [SLF4J - sematext](https://sematext.com/blog/slf4j-tutorial/)
+  * [MDC](https://www.slf4j.org/api/org/slf4j/MDC.html)
+  * [Apache Log4j2 SLF4J Binding](https://logging.apache.org/log4j/2.x/log4j-slf4j-impl.html)
+  * [Can we use all features of log4j2 if we use it along with slf4j api?](https://stackoverflow.com/questions/41633278/can-we-use-all-features-of-log4j2-if-we-use-it-along-with-slf4j-api)
+  * [What is the difference between ThreadContext.put() and MDC.Put()?](https://stackoverflow.com/questions/59540355/what-is-the-difference-between-threadcontext-put-and-mdc-put)
+  * [Is it worth to use slf4j with log4j2](https://stackoverflow.com/questions/41498021/is-it-worth-to-use-slf4j-with-log4j2)
+  * [SLF4J Vs Log4j](https://www.tutorialspoint.com/slf4j/slf4j_vs_log4j.htm)
+* Currently we are using Log4J2 as our logging framework in this way with `log4j2.xml` configuration at src/main/resources:
+
+* In TestUtils.java class: 
+```java
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class TestUtils {
+  public Logger log() {
+    return LogManager.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
+  }
+}
+```
+* In BaseTest.java class
+
+```java
+import org.apache.logging.log4j.ThreadContext;
+import org.testng.annotations.BeforeTest;
+
+public class BaseTest {
+    
+  @BeforeTest
+  public void setup() {
+    ThreadContext.put("ROUTINGKEY",strFile);
+  }
+}
+
+```
+
+* [Log4j 2 SLF4J Binding] (https://logging.apache.org/log4j/2.x/log4j-slf4j-impl.html)
+* The Log4j 2 SLF4J Binding allows applications coded to the SLF4J API to use Log4j 2 as the implementation.
+  * `log4j-slf4j2-impl` should be used with SLF4J 2.0.x releases or newer.
+* Simple Logging Facade for Java (abbreviated SLF4J) acts as a facade for different logging frameworks (e.g., java.util.logging, logback, Log4j). It offers a generic API, making the logging independent of the actual implementation.
+* This allows for different logging frameworks to coexist. And it helps migrate from one framework to another. Finally, apart from standardized API, it also offers some “syntactic sugar.”
+* To use SLF4J with Log4j 2, we add the following libraries to pom.xml:
+```xml
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-api</artifactId>
+    <version>2.7</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-core</artifactId>
+    <version>2.7</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-slf4j2-impl</artifactId>
+    <version>2.7</version>
+</dependency>
+```
+
+* For usage, we replace `LogManager` with `LoggerFactory` to call getLogger.
+* In TestUtils.java class:
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class TestUtils {
+  public Logger log() {
+    return LoggerFactory.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
+  }
+}
+```
+* In BaseTest.java class, we use `MDC` instead of `ThreadContext`
+```java
+import org.slf4j.MDC;
+
+public class BaseTest {
+    
+  @BeforeTest
+  public void setup() {
+    MDC.put("ROUTINGKEY", strFile);
+  }
+}
+```
+* All the configurations of `log4j2.xml` remain same.
+
+> With the integration of SLF4J,  you no longer get this annoying warning in IntelliJ: `SLF4J: No SLF4J providers were found. SLF4J: Defaulting to no-operation (NOP) logger implementation`
 
 ### Start Appium server programmatically
 

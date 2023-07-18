@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
 <suite name="Swag Labs Demo App Suite" parallel="tests" thread-count="2" configfailurepolicy="continue">
+    <listeners>
+        <listener class-name="com.itkhanz.listeners.TestListener" />
+    </listeners>
 
     <test name="Pixel_5">
-        <listeners>
-            <listener class-name="com.itkhanz.listeners.TestListener" />
-        </listeners>
+
         <parameter name="platformName" value="Android" />
         <parameter name="deviceName" value="Pixel_5" />
         <parameter name="udid" value="emulator-5554" />
@@ -22,9 +24,6 @@
     </test> <!-- Test -->
 
     <test name="iPhone14">
-        <listeners>
-            <listener class-name="com.itkhanz.listeners.TestListener" />
-        </listeners>
         <parameter name="platformName" value="iOS" />
         <parameter name="deviceName" value="iPhone 14" />
         <parameter name="udid" value="1E8FE39B-1118-4117-B02B-66A390AECB3F" />

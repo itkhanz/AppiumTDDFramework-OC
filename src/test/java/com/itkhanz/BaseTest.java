@@ -12,11 +12,11 @@ import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import io.appium.java_client.screenrecording.CanRecordScreen;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.logging.log4j.ThreadContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.MDC;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 import org.testng.annotations.Optional;
@@ -107,7 +107,8 @@ public class BaseTest {
             logFile.mkdirs();
         }
         //route logs to separate file for each thread
-        ThreadContext.put("ROUTINGKEY", strFile);
+        //ThreadContext.put("ROUTINGKEY", strFile); //LOG4J2
+        MDC.put("ROUTINGKEY", strFile); //SLF4J
         testUtils.log().info("log path: " + strFile);
 
         setPlatform(platformName); //we declared platform as protected class variable because we need this info in test cases

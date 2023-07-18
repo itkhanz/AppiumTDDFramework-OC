@@ -13,7 +13,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.swing.plaf.PanelUI;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 

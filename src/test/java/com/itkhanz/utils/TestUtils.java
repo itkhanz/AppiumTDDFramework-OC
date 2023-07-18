@@ -1,8 +1,8 @@
 package com.itkhanz.utils;
 
 import com.itkhanz.BaseTest;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -50,7 +50,11 @@ public class TestUtils {
     }
 
     //TODO create a logger interface and implementation class instead of this way
-    public Logger log() {
+    /*public Logger log() {
         return LogManager.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
+    }*/
+
+    public Logger log() {
+        return LoggerFactory.getLogger(Thread.currentThread().getStackTrace()[2].getClassName());
     }
 }
