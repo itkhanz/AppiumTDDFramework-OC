@@ -6,7 +6,7 @@ This repo contains the source code for Appium Java TDD Framework designed during
 
 <img src="doc/framework-design.png">
 
---
+---
 
 ## Libraries and Tools
 
@@ -24,7 +24,7 @@ This repo contains the source code for Appium Java TDD Framework designed during
     * [Sauce Labs Native Sample Application](https://github.com/saucelabs/sample-app-mobile)
 * IntelliJ IDE
 
---
+---
 
 ## Pre-requisites
 
@@ -39,7 +39,7 @@ This repo contains the source code for Appium Java TDD Framework designed during
 * configure device specific parameters in testng.xml
 * Run tests with testng.xml
 
---
+---
 
 ## Course Notes
 
@@ -103,6 +103,8 @@ Following sections summarize the important notes taken during the framework deve
 * Design the framework to achieve scalability, maintainability, abstraction, parameterization, robust logging and
   reporting,
 
+---
+
 ### Part 2 - Implement Page Object Model (POM) design
 
 <img src="doc/framework-structure.png" width="1200">
@@ -126,6 +128,8 @@ Following sections summarize the important notes taken during the framework deve
   methods in
   parent class, or declare the elements inside Test Class instead of Pages which is not a good practice.
 *
+
+---
 
 ### Part 3 - Alternate Design | Abstract Test Data & Static Text | Exception Handling
 * This lecture will discuss:
@@ -227,6 +231,8 @@ public HashMap<String, String> parseStringXML(InputStream file) throws Exception
 ```
 * And then we can simply read it by parsing the XML stream as InputStream and storing it into HashMap.
 
+---
+
 ### Part 4 - Support iOS Platform
 
 * Appium provides a common API to test both iOS and Android platforms.
@@ -261,6 +267,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 * it will take some time, afterwards show the ** TEST BUILD SUCCEEDED ** in terminal, so after this you can close the terminal and execute the tests with prebuilt WDA.
 * Additionally, you can also provide additional capabilities of webDriverAgentUrl and derivedDataPath to further speed up the tests.
 
+
+---
 
 ### Part 5 - Add more test cases | Define common elements | Write independent tests
 
@@ -302,6 +310,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 * To make the test cases completely independent of failures, we can handle the login and logout in @BeforeMethod and @AfterMethod
 
 
+---
+
 ### Scrolling - UIAutomator2 | Mobile Scroll
 
 #### Android Scroll
@@ -322,6 +332,7 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 > UiScrollable does not support single quite for nested commas, instead always use double quotes with escape character.
 
 > If there is only one scrollable element on the page, then you dont have to find the parent scrollable element and you can just use .scrollable(true)  
+
 
 #### iOS Scroll
 
@@ -344,6 +355,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
         driver.executeScript("mobile: scrollToElement", scrollMap);
     }
 ```
+
+---
 
 ### Capture Screenshots
 
@@ -381,6 +394,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 <img src="doc/screenshote-folder.png">
 
+---
+
 #### Add screenshot to TestNG report HTML
 
 > By default, IntelliJ does not generate test-output folder, and so you cannot view the TestNG HTML report.
@@ -399,6 +414,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 > IntelliJ shows broken image in the browser. For previewing the report with image, view it by opening it in browser
   from system instead of from Intellij server.
 
+
+---
 
 ### Record Videos
 
@@ -423,6 +440,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 `((CanRecordScreen) driver).startRecordingScreen(IOSStartScreenRecordingOptions.startScreenRecordingOptions().withVideoType("mpeg4"));
 `
+
+---
 
 ### Parallel Execution using Real Android and iOS devices
 
@@ -533,6 +552,8 @@ This will result in Appium using the prebuilt WDA and the test execution will sp
 
 <img src="doc/screenshot-custom-logs.png" width="900">
 
+
+---
 
 ### Log4j2 Logging framework integration
 
@@ -955,6 +976,67 @@ public class BaseTest {
 
 > With the integration of SLF4J,  you no longer get this annoying warning in IntelliJ: `SLF4J: No SLF4J providers were found. SLF4J: Defaulting to no-operation (NOP) logger implementation`
 
+---
+
 ### Start Appium server programmatically
+
+* If you want to run the appium tests as part of CI/CD pipeline, then appium server should start and stop
+  programmatically.
+* Otherwise you have to start it manually and make sure its running.
+* We will
+  use [AppiumServiceBuilder](https://javadoc.io/static/io.appium/java-client/8.5.1/io/appium/java_client/service/local/AppiumServiceBuilder.html)
+  and [AppiumDriverLocalService](https://javadoc.io/doc/io.appium/java-client/latest/io/appium/java_client/service/local/AppiumDriverLocalService.html)
+* If using TestNG, start the Appium server under `@BeforeSuite` annotation or `@AfterSuite` annotation:
+  * If running `tests` in parallel using **Single Appium Server Instance**, then start under `@BeforeSuite`
+  * If running `tests` in parallel using **Separate Appium Server Instance** for each thread (i.e. each mobile device),
+    then start under `@BeforeTest` using different port number.
+* We will also check if appium server is already running (using `AppiumDriverLocalService.isRunning()` or by checking if
+  port is already in use)
+* Command to free port on Mac:
+  `lsof -P | grep ':4723' | awk '{print $2}' | xargs kill -9`
+* https://stackoverflow.com/questions/3855127/find-and-kill-process-locking-port-3000-on-mac
+* Path to usingDriverExecutable() can be found by `where node` on Mac
+* Run the command `where appium` to find the appium executable shortcut path on Mac.
+* Path to withAppiumJS() can be found by right-clicking the appium binary shortcut at above location and then show
+  original.
+* If you are running the tests from intellij, then it will not read the path of system environment and path variables. so we need to add them manually.
+* Make sure you have environment variables set. Below is a sample for my `.~zshrc`:
+```text
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home
+export PATH=$PATH:$JAVA_HOME/bin
+
+export MAVEN_HOME=/Library/Maven/apache-maven-3.9.2
+export PATH=$PATH:$MAVEN_HOME/bin
+eval "$(/usr/local/bin/brew shellenv)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export ANDROID_HOME=${HOME}/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools
+```
+* Path to JDK, Android SDK, platform-tools, cmdline-tools should be set in environment variables.
+* run the command `echo $PATH` to get the path variables
+* if you get an
+  error `AppiumServerHasNotBeenStartedLocallyException: [The local appium server has not been started, Reason: Timed out waiting for [http://http/127.0.0.1:4723/status] to be available after 20003 ms, Consider increasing the server startup timeout value (currently 20000ms), Node.js executable path: /Users/ibkh/.nvm/versions/node/v18.16.0/bin/node,`,
+  then increase the server timeout property.
+* Even though `ANDROID_HOME` environment variable is set, but IntelliJ does not locate it, so if you get an
+  error like `[Appium] spawn npm ENOENT`
+  or `org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Response code 500. Message: An unknown server-side error occurred while processing the command. Original error: Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported.`,
+  then add the the path to ANDROID_HOME. This can be found by opening Android Studio -> SDK Manager and copy the path
+  in `Android SDK Location` field, and add it also to the environment variable.
+* If you get an error
+  like `[Xcode] Cannot determine the path to Xcode by running 'xcode-select -p' command. Original error: 'xcode-select' executable is not found`
+  or `simulator with UDID not found`, this is because IntelliJ cannot determine the path to XCode Commandline tools so
+  you have to add them manually. You can find the installation path of Xcode by running `xcode-select -p` and of
+  xcode-select by running `where xcode-select` then add the path to your appium service builder.
+* Alternatively you an skip providing the environment variables for appium server, and instead run the tests through maven surefire plugin which will automatically load the environment variables.
+* This is how the appium server logs will be captured in `server.log`. Logs for suite are captured separately in server/datetime/application.log
+
+* <img src="doc/appium-server-logs.png">
+
+---
 
 ### Extent Reports integration

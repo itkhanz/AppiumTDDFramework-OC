@@ -11,6 +11,9 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.options.XCUITestOptions;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import io.appium.java_client.screenrecording.CanRecordScreen;
+import io.appium.java_client.service.local.AppiumDriverLocalService;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import org.apache.commons.codec.binary.Base64;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -26,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.time.Duration;
 import java.util.*;
@@ -40,6 +44,7 @@ public class BaseTest {
     protected static ThreadLocal<String>  platform = new ThreadLocal<String>();
     protected static ThreadLocal<String>  device = new ThreadLocal<String>();
     public static ThreadLocal<String> dateTime = new ThreadLocal<String>();
+    private static AppiumDriverLocalService appiumService;
 
     TestUtils testUtils = new TestUtils();
 
@@ -87,6 +92,94 @@ public class BaseTest {
 
     public BaseTest() {
         PageFactory.initElements(new AppiumFieldDecorator(getDriver()),this);
+    }
+
+    @BeforeSuite
+    protected void beforeSuite() {
+        String folderName = "logs" + File.separator + "server" + File.separator + TestUtils.getFormattedDateTime();
+        File logFolder = new File(folderName);
+        if (!logFolder.exists()) {
+            logFolder.mkdirs();
+        }
+        //route logs to separate file for each thread
+        //ThreadContext.put("ROUTINGKEY", strFile); //LOG4J2
+        MDC.put("ROUTINGKEY", folderName); //SLF4J
+
+        appiumService = getAppiumService(folderName);
+        if (!checkIfAppiumServerIsRunnning(4723)) {
+            appiumService.start();
+            appiumService.clearOutPutStreams(); // -> Comment this if you want to see server logs in the console
+            testUtils.log().info("*********** Appium Server Started ***********");
+        } else {
+            testUtils.log().info("*********** Appium Server Already Running ***********");
+        }
+    }
+
+    @AfterSuite (alwaysRun = true)
+    protected void afterSuite() {
+        if (appiumService.isRunning()) {
+            appiumService.stop();
+            testUtils.log().info("*********** Appium Server Stopped ***********");
+        }
+    }
+
+    protected boolean checkIfAppiumServerIsRunnning(int port) {
+        boolean isAppiumServerRunning = false;
+        ServerSocket socket;
+        try {
+            socket = new ServerSocket(port);
+            socket.close();
+        } catch (IOException e) {
+            isAppiumServerRunning = true;
+        } finally {
+            socket = null;
+        }
+        return isAppiumServerRunning;
+    }
+
+    protected AppiumDriverLocalService getAppiumService(String appiumLogsFolder) {
+
+        //comment this line if you are running tests through maven surefire plugin
+        HashMap<String, String> environment = getEnvironmentMapForAppiumServer();
+
+        return AppiumDriverLocalService.buildService(
+          new AppiumServiceBuilder()
+                  .usingDriverExecutable(new File("/Users/ibkh/.nvm/versions/node/v18.16.0/bin/node"))
+                  .withAppiumJS(new File("/Users/ibkh/.nvm/versions/node/v18.16.0/lib/node_modules/appium/index.js"))
+                  //.withIPAddress("http://127.0.0.1")
+                  .usingPort(4723)
+                  .withArgument(GeneralServerFlag.USE_DRIVERS, "uiautomator2,xcuitest")
+                  .withArgument(GeneralServerFlag.SESSION_OVERRIDE)
+                  .withLogFile(new File(appiumLogsFolder + "/server.log"))
+                  .withTimeout(Duration.ofSeconds(20))
+                  .withEnvironment(environment) //only needed when running tests with IntelliJ and not from maven cmd
+        );
+    }
+
+    protected HashMap<String, String> getEnvironmentMapForAppiumServer() {
+        //IntelliJ does not have access to path and environment variables which are necessary to run appium server like JDK, Android SDK, cmdline-tools etc
+        //so we need to provide it in the code by ourselves
+        HashMap<String, String> environment = new HashMap<String, String>();
+        //RUN echo $PATH
+        //Add the PATH for Node, JDK, Maven, ANDROID_HOME, Android platform-tools, cmdline-tools
+        final String NODE = "/Users/ibkh/.nvm/versions/node/v18.16.0/bin";
+        final String MAVEN = "/usr/local/bin:/Library/Java/JavaVirtualMachines/jdk-17.0.2.jdk/Contents/Home/bin";
+        final String JAVA = "/Library/Maven/apache-maven-3.9.2/bin";
+        final String ANDROID_CMD_TOOLS = "/Users/ibkh/Library/Android/sdk/cmdline-tools";
+        final String ANDROID_PLATFORM_TOOLS = "/Users/ibkh/Library/Android/sdk/platform-tools";
+
+        final String zshrcPath = NODE + ":" + MAVEN + ":" + JAVA + ":" + ANDROID_CMD_TOOLS + ":" + ANDROID_PLATFORM_TOOLS;
+        //RUN where xcode-select will give result as /usr/bin/xcode-select
+        //Append to the PATH
+        final String xcodeSelect = ":/usr/bin/";
+
+        environment.put("PATH", zshrcPath + xcodeSelect);
+
+        //ANDROID_HOME can be found by echo $ANDROID_HOME or opening SDK Manager in Android Studio
+        final String ANDROID_HOME = "/Users/ibkh/Library/Android/sdk";
+        environment.put("ANDROID_HOME", ANDROID_HOME);
+
+        return environment;
     }
 
     @Parameters({"platformName", "udid", "deviceName", "emulator", "systemPort", "chromeDriverPort", "wdaLocalPort"})
@@ -177,7 +270,7 @@ public class BaseTest {
             }
 
             String sessionID = driver.getSessionId().toString();
-            testUtils.log().info("Appium Driver is initialized with session id: " + sessionID);
+            testUtils.log().info("************ Appium Driver is initialized with session id: " + sessionID);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -189,11 +282,12 @@ public class BaseTest {
 
     }
 
-    //TODO driver must be initialized and closed after each test test method
-    //TODO add alwaysrun true
-    @AfterTest
+    @AfterTest (alwaysRun = true)
     public void teardown() {
-        if (getDriver()!= null) getDriver().quit();
+        if (getDriver()!= null)  {
+            getDriver().quit();
+            testUtils.log().info("****** Appium Driver Session closed ************");
+        }
     }
 
     @BeforeMethod
@@ -210,7 +304,7 @@ public class BaseTest {
 
         Map<String, String> testParams = result.getTestContext().getCurrentXmlTest().getAllParameters();
 
-        //TODO datetime will be different this time because the sceeenshot is captured in listener which executes before this  method which causes few seconds difference so separatte folder is getting created for videos
+        //TODO datetime will be different this time because the screenshot is captured in listener which executes before this  method which causes few seconds difference so separatte folder is getting created for videos
         //TODO sync the time for both screenshots and videos so both are created under single timestamp
         //TODO above issue is possibly resolved becasue of threadlocal dateTime
         String dirPath =  "media" + File.separator
