@@ -28,8 +28,7 @@ public class LoginPage extends BaseTest {
 
     public LoginPage enterUserName(String username) {
         clear(usernameTxtFld);  //iOS may not clear the text input field automatically when entering text
-        testUtils.log().info("login with user: " + username);
-        sendKeys(usernameTxtFld, username);
+        sendKeys(usernameTxtFld, username, "login with user: " + username);
         return this;
     }
 

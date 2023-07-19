@@ -1,9 +1,11 @@
 package com.itkhanz.listeners;
 
+import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 import com.itkhanz.BaseTest;
 import com.itkhanz.reports.ExtentManager;
 import com.itkhanz.utils.TestUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.testng.ITestContext;
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,6 +81,8 @@ public class TestListener implements ITestListener {
         String completeImagePath = Paths.get(imagePath).toAbsolutePath().toString();
 
         File file = base.getDriver().getScreenshotAs(OutputType.FILE);
+
+        //save the file to disk
         try {
             FileUtils.copyFile(file, new File(imagePath));
             Reporter.log("Attaching the captured screenshot to HTML Report");
@@ -87,7 +92,22 @@ public class TestListener implements ITestListener {
             testUtils.log().info("Failed to save the screenshot");
         }
 
-        ExtentManager.getTest().log(Status.FAIL, "Test Failed");
+        //convert the file to base64 string and embed in report
+        byte[] encodedImage = null;
+        try {
+            encodedImage = Base64.encodeBase64(FileUtils.readFileToByteArray(file));
+            ExtentManager.getTest().fail("Test Failed",
+                    MediaEntityBuilder.createScreenCaptureFromBase64String(
+                                    new String(encodedImage, StandardCharsets.UTF_8),
+                                    result.getName())
+                            .build()
+            );
+        } catch (IOException e1) {
+            System.out.println("Failed to convert the file to base64");
+            e1.printStackTrace();
+        }
+        //ExtentManager.getTest().log(Status.FAIL, "Test Failed");
+        ExtentManager.getTest().fail(result.getThrowable());    //prints the stack trace to report
     }
 
 

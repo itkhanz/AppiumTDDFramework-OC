@@ -108,6 +108,7 @@ public class BaseTest {
         //ThreadContext.put("ROUTINGKEY", strFile); //LOG4J2
         MDC.put("ROUTINGKEY", folderName); //SLF4J
 
+        //starts the appium server
         appiumService = getAppiumService(folderName);
         if (!checkIfAppiumServerIsRunnning(4723)) {
             appiumService.start();
@@ -117,7 +118,7 @@ public class BaseTest {
             testUtils.log().info("*********** Appium Server Already Running ***********");
         }
 
-
+        //sets the System/Environment info for extent report
         ExtentManager.getReporter().setSystemInfo("OS", System.getProperty("os.name"));
         Properties projectProps = new Properties();
         try {
@@ -254,6 +255,7 @@ public class BaseTest {
                                 .setAppActivity(getProps().getProperty("androidAppActivity"))
                                 //.setApp(appURL) //not needed when app is pre-installed
                                 .setAppWaitActivity(getProps().getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
+                                .setAppWaitDuration(Duration.ofSeconds(30))
                                 .setSystemPort(Integer.parseInt(systemPort))
                                 .setChromedriverPort(Integer.parseInt(chromeDriverPort))
                                 ;
@@ -413,7 +415,9 @@ public class BaseTest {
 
     public String getAttribute(WebElement element, String attribute) {
         waitForVisibility(element);
-        return element.getAttribute(attribute);
+        String attr =  element.getAttribute(attribute);
+        ExtentManager.getTest().log(Status.INFO, attribute + " attribute value is: " + attr);
+        return attr;
     }
     public String getAttribute(WebElement element, String attribute, String msg) {
         testUtils.log().info(msg);
@@ -434,11 +438,19 @@ public class BaseTest {
         testUtils.log().info(msg);
         ExtentManager.getTest().log(Status.INFO, msg);
         String txt = null;
-        return switch (getPlatform()) {
-            case "Android" -> getAttribute(e, "text");
-            case "iOS" -> getAttribute(e, "label");
-            default -> null;
+
+        switch (getPlatform()) {
+            case "Android" -> {
+                txt = getAttribute(e, "text");
+            }
+            case "iOS" -> {
+                txt = getAttribute(e, "label");
+            }
+            default -> {
+                return txt;
+            }
         };
+        return txt;
     }
 
 

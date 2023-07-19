@@ -1241,7 +1241,36 @@ owner=itkhanz
 
 <img src="doc/extent-environment.png">
 
-* 
+* Use base64 screenshots that will make the screenshots embed in the report unlike the file format in which report
+  attaches the screenshot with img tag.
+* This will help to send the report as Email with embedded images.
+* We will convert our file to byte array and then to String base64 string to pass to MediaEntityBuilder method.
+* The disadvantage is that, this will increase the report size substantially i.e. approx 1MB for each image. But On
+  verifying with 2 screenshots attached, report size was still below 1 MB.
+
+```java
+// reference image saved to disk
+test.fail(MediaEntityBuilder.createScreenCaptureFromPath("img.png").build());
+
+// base64
+test.fail(MediaEntityBuilder.createScreenCaptureFromBase64String("base64").build());
+```
+
+* Intentionally failed the test to see the output of attached screenshot and stacktrace in output:
+* Here is how the report looks like after a full test run:
+
+<img src="doc/extent-overview.png" width="1300">
+
+<img src="doc/extent-authors.png" width="1300">
+
+<img src="doc/extent-tags.png" width="1300">
+
+<img src="doc/extent-exceptions.png" width="1300">
+
+<img src="doc/extent-stacktrace.png" width="1300">
+
+<img src="doc/extent-screenshot.png" width="1300">
+
 
 
 
