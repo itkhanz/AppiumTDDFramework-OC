@@ -13,8 +13,7 @@ public class MenuPage extends BaseTest {
     private WebElement settingsBtn;
 
     public SettingsPage pressSettingsBtn() {
-        testUtils.log().info("press Settings button");
-        click(settingsBtn);
+        click(settingsBtn, "press Settings button");
         return new SettingsPage();
     }
 }

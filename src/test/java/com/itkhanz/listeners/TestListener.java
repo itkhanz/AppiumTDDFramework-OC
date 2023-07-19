@@ -1,6 +1,8 @@
 package com.itkhanz.listeners;
 
+import com.aventstack.extentreports.Status;
 import com.itkhanz.BaseTest;
+import com.itkhanz.reports.ExtentManager;
 import com.itkhanz.utils.TestUtils;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
@@ -21,13 +23,28 @@ public class TestListener implements ITestListener {
     TestUtils testUtils = new TestUtils();
 
     @Override
+    public void onStart(ITestContext context) {
+        ITestListener.super.onStart(context);
+    }
+
+    @Override
+    public void onFinish(ITestContext context) {
+        ExtentManager.getReporter().flush();
+    }
+
+    @Override
     public void onTestStart(ITestResult result) {
         ITestListener.super.onTestStart(result);
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        ITestListener.super.onTestSuccess(result);
+        ExtentManager.getTest().log(Status.PASS, "Test Passed");
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        ExtentManager.getTest().log(Status.SKIP, "Test Skipped");
     }
 
     @Override
@@ -69,12 +86,10 @@ public class TestListener implements ITestListener {
             e.printStackTrace();
             testUtils.log().info("Failed to save the screenshot");
         }
+
+        ExtentManager.getTest().log(Status.FAIL, "Test Failed");
     }
 
-    @Override
-    public void onTestSkipped(ITestResult result) {
-        ITestListener.super.onTestSkipped(result);
-    }
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
@@ -84,15 +99,5 @@ public class TestListener implements ITestListener {
     @Override
     public void onTestFailedWithTimeout(ITestResult result) {
         ITestListener.super.onTestFailedWithTimeout(result);
-    }
-
-    @Override
-    public void onStart(ITestContext context) {
-        ITestListener.super.onStart(context);
-    }
-
-    @Override
-    public void onFinish(ITestContext context) {
-        ITestListener.super.onFinish(context);
     }
 }

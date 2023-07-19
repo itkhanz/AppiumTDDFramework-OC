@@ -68,7 +68,7 @@ public class ProductTest extends BaseTest {
         loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
     }
 
-    @Test
+    @Test (description = "Validate the Sauce Labs Backpack title and price on HomePage")
     public void validateProductOnProductsPage() {
         String SLBTitle = productsPage.getSLBTitle();
         String SLBPrice = productsPage.getSLBPrice();
@@ -80,7 +80,7 @@ public class ProductTest extends BaseTest {
         sa.assertAll();
     }
 
-    @Test
+    @Test (description = "Validate the Sauce Labs Backpack title, text and price on product details page")
     public void validateProductOnProductDetailsPage() {
         productDetailsPage = productsPage.pressSLBTitle();
 

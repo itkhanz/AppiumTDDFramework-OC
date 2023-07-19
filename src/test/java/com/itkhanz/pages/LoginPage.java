@@ -35,14 +35,12 @@ public class LoginPage extends BaseTest {
 
     public LoginPage enterPassword(String password) {
         clear(passwordTxtFld);
-        testUtils.log().info("password is: " + password);
-        sendKeys(passwordTxtFld, password);
+        sendKeys(passwordTxtFld, password, "password is: " + password);
         return this;
     }
 
     public ProductsPage pressLoginBtn() {
-        testUtils.log().info("pressing login button");
-        click(loginBtn);
+        click(loginBtn, "pressing login button");
         return new ProductsPage();
     }
 
@@ -55,8 +53,8 @@ public class LoginPage extends BaseTest {
     public String getErrTxt() {
         //since text attribute does not exist for iOS, so we wrote a custom method to return text or label based on platform
         //return getAttribute(errTxt, "text");
-        String err = getLabelText(errTxt);
-        testUtils.log().info("login error text is - " + err);
+        String err = getLabelText(errTxt, "getting error text attribute label/test");
+        testUtils.log().info("error text is: " + err);
         return err;
     }
 }

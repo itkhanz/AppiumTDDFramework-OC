@@ -56,7 +56,7 @@ public class LoginTest extends BaseTest {
         testUtils.log().info(".....LoginTest after method.....");
     }
 
-    @Test
+    @Test (description = "This tests validates the failed login attempt with invalid username")
     public void invalidUsernameTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file
@@ -73,7 +73,7 @@ public class LoginTest extends BaseTest {
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
 
-    @Test
+    @Test (description = "This tests validates the failed login attempt with invalid password")
     public void invalidPasswordTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file
@@ -89,7 +89,7 @@ public class LoginTest extends BaseTest {
         Assert.assertEquals(actualErrTxt, expectedErrTxt);
     }
 
-    @Test
+    @Test (description = "This tests validates the successful login attempt with valid credentials")
     public void successfulLoginTest() {
         //TODO chain the methods to achieve fluent design
         //TODO read the test data from external file

@@ -1,6 +1,8 @@
 package com.itkhanz;
 
+import com.aventstack.extentreports.Status;
 import com.itkhanz.constants.Constants;
+import com.itkhanz.reports.ExtentManager;
 import com.itkhanz.utils.TestUtils;
 import com.itkhanz.utils.XMLUtils;
 import io.appium.java_client.AppiumDriver;
@@ -28,6 +30,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
@@ -113,6 +116,21 @@ public class BaseTest {
         } else {
             testUtils.log().info("*********** Appium Server Already Running ***********");
         }
+
+
+        ExtentManager.getReporter().setSystemInfo("OS", System.getProperty("os.name"));
+        Properties projectProps = new Properties();
+        try {
+            projectProps.load(getClass().getClassLoader().getResourceAsStream("project.properties"));
+            ExtentManager.getReporter().setSystemInfo("JDK", projectProps.getProperty("java-version"));
+            ExtentManager.getReporter().setSystemInfo("Appium Server", projectProps.getProperty("appium-server"));
+            ExtentManager.getReporter().setSystemInfo("Appium Client", projectProps.getProperty("appium-version"));
+            ExtentManager.getReporter().setSystemInfo("TestNG", projectProps.getProperty("testng-version"));
+            ExtentManager.getReporter().setSystemInfo("ExtentReport", projectProps.getProperty("extentreports-version"));
+            ExtentManager.getReporter().setSystemInfo("Owner", projectProps.getProperty("owner"));
+        } catch (IOException e) {
+            testUtils.log().info("failed to load project.properties");
+        }
     }
 
     @AfterSuite (alwaysRun = true)
@@ -151,7 +169,7 @@ public class BaseTest {
                   .withArgument(GeneralServerFlag.USE_DRIVERS, "uiautomator2,xcuitest")
                   .withArgument(GeneralServerFlag.SESSION_OVERRIDE)
                   .withLogFile(new File(appiumLogsFolder + "/server.log"))
-                  .withTimeout(Duration.ofSeconds(20))
+                  .withTimeout(Duration.ofSeconds(30))
                   .withEnvironment(environment) //only needed when running tests with IntelliJ and not from maven cmd
         );
     }
@@ -207,6 +225,8 @@ public class BaseTest {
         setPlatform(platformName); //we declared platform as protected class variable because we need this info in test cases
         setDevice(deviceName);
         setDateTime(TestUtils.getFormattedDateTime());
+        ;
+
         try {
             String xmlFileName = "strings/strings.xml";
             stringsStream = getClass().getClassLoader().getResourceAsStream(xmlFileName);
@@ -291,7 +311,12 @@ public class BaseTest {
     }
 
     @BeforeMethod
-    public void beforeMethodBase() {
+    public void beforeMethodBase(Method method) {
+        ExtentManager.startTest(method.getName(), method.getAnnotation(Test.class).description())
+                .assignCategory(getPlatform() + "_" + getDevice())
+                .assignAuthor("itkhanz")
+                ;
+
         //testUtils.log().info(".....super before method.....");
         ((CanRecordScreen) getDriver()).startRecordingScreen();
     }
@@ -363,6 +388,12 @@ public class BaseTest {
         waitForVisibility(element);
         element.click();
     }
+    public void click(WebElement e, String msg) {
+        waitForVisibility(e);
+        testUtils.log().info(msg);
+        ExtentManager.getTest().log(Status.INFO, msg);
+        e.click();
+    }
 
     public void clear(WebElement element) {
         waitForVisibility(element);
@@ -373,13 +404,35 @@ public class BaseTest {
         waitForVisibility(element);
         element.sendKeys(text);
     }
+    public void sendKeys(WebElement e, String txt, String msg) {
+        waitForVisibility(e);
+        testUtils.log().info(msg);
+        ExtentManager.getTest().log(Status.INFO, msg);
+        e.sendKeys(txt);
+    }
 
     public String getAttribute(WebElement element, String attribute) {
         waitForVisibility(element);
         return element.getAttribute(attribute);
     }
+    public String getAttribute(WebElement element, String attribute, String msg) {
+        testUtils.log().info(msg);
+        ExtentManager.getTest().log(Status.INFO, msg);
+        waitForVisibility(element);
+        return element.getAttribute(attribute);
+    }
 
     public String getLabelText(WebElement e) {
+        String txt = null;
+        return switch (getPlatform()) {
+            case "Android" -> getAttribute(e, "text");
+            case "iOS" -> getAttribute(e, "label");
+            default -> null;
+        };
+    }
+    public String getLabelText(WebElement e, String msg) {
+        testUtils.log().info(msg);
+        ExtentManager.getTest().log(Status.INFO, msg);
         String txt = null;
         return switch (getPlatform()) {
             case "Android" -> getAttribute(e, "text");

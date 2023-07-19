@@ -22,26 +22,25 @@ public class ProductsPage extends MenuPage {
 
     public String getTitle() {
         //return getAttribute(productTitleTxt, "text");
-        String title =  getLabelText(productTitleTxt);
+        String title =  getLabelText(productTitleTxt, "getting SLB Text attribute label/test");
         testUtils.log().info("product page title is - " + title);
         return title;
     }
 
     public String getSLBTitle() {
-        String title = getLabelText(SLBTitle);
+        String title = getLabelText(SLBTitle, "getting SLB Title attribute label/test");
         testUtils.log().info("SLB title is - " + title);
         return title;
     }
 
     public String getSLBPrice() {
-        String price = getLabelText(SLBPrice);
+        String price = getLabelText(SLBPrice, "getting SLB Price attribute label/test");
         testUtils.log().info("SLB price is - " + price);
         return price;
     }
 
     public ProductDetailsPage pressSLBTitle() {
-        click(SLBTitle);
-        testUtils.log().info("Navigating to SLB Product Details page");
+        click(SLBTitle, "Navigating to SLB Product Details page");
         return new ProductDetailsPage();
     }
 }

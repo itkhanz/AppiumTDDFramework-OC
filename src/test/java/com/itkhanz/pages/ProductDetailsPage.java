@@ -57,20 +57,19 @@ public class ProductDetailsPage extends MenuPage{
     }
 
     public String getSLBTitle() {
-        String title = getLabelText(SLBTitle);
+        String title = getLabelText(SLBTitle, "getting SLB Title attribute label/test");
         testUtils.log().info("SLB title on DetailsPage is: " + title);
         return title;
     }
 
     public String getSLBTxt() {
-        String txt = getLabelText(SLBTxt);
+        String txt = getLabelText(SLBTxt, "getting SLB Text attribute label/test");
         testUtils.log().info("SLB text on DetailsPage is: " + txt);
         return txt;
     }
 
     public ProductsPage pressBackToProductsBtn() {
-        click(backToProductsBtn);
-        testUtils.log().info("Navigating back to products page");
+        click(backToProductsBtn, "Navigating back to products page");
         return new ProductsPage();
     }
 
@@ -78,11 +77,11 @@ public class ProductDetailsPage extends MenuPage{
         //TODO use W3C Actions to implement platform independent scrolling
         switch (getPlatform()) {
             case "Android" -> {
-                return getLabelText(AndroidScrollToSLBPrice());
+                return getLabelText(AndroidScrollToSLBPrice(), "scrolling to product price in Android and getting price");
             }
             case "iOS" -> {
                 iOSScrollToSLBPrice();
-                return getLabelText(SLBPrice);
+                return getLabelText(SLBPrice, "getting SLB Price attribute label/test");
             }
             default -> throw new RuntimeException("Inavlid platform! - " + platform);
         }

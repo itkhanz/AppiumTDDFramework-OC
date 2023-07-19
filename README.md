@@ -20,6 +20,9 @@ This repo contains the source code for Appium Java TDD Framework designed during
         * xcuitest@4.32.19
 * Appium inspector 2023.5.2
 * Maven surefire plugin 3.1.2
+* Log4J2 2.20.0
+* SLF4J 2.20.0
+* ExtentReports 5.0.9
 * Demo Apps
     * [Sauce Labs Native Sample Application](https://github.com/saucelabs/sample-app-mobile)
 * IntelliJ IDE
@@ -1040,3 +1043,210 @@ export PATH=$PATH:$ANDROID_HOME/cmdline-tools
 ---
 
 ### Extent Reports integration
+
+* [Extent Reports](https://www.extentreports.com/)
+* [Extent Reports v5 Docs- Java](https://www.extentreports.com/docs/versions/5/java/index.html)
+* [extentreports-java - GitHub](https://github.com/extent-framework/extentreports-java)
+* [extentreports-java-v5 - GitHub Wiki](https://github.com/extent-framework/extentreports-java/wiki)
+* [Extent Spark Reporter Sample](https://github.com/extent-framework/extentreports-java)
+* [ExtentReports 5.x tutorial series by Testing Mini Bytes / Amuthan Sakthivel](https://www.youtube.com/playlist?list=PL9ok7C7Yn9A-yUEnE62gOQ2B4pL3gsC28)
+* [ExtentReports » 5.0.9 --> Vulnerabilities from dependencies](https://github.com/extent-framework/extentreports-java/issues/376)
+* [Updated to selenium 4.9.0- now working extent report broke](https://github.com/extent-framework/extentreports-java/issues/382)
+* [Extent Reports in Selenium with TestNG](https://www.swtestacademy.com/extent-reports-in-selenium-with-testng/)
+* []()
+
+> Extent Reports is not being maintained actively any more so it is suggested to use other reporting libraries.
+
+
+* Using Extent API, we will:
+  * leverage TestNG iTestListener
+  * capture logs for each step
+  * capture screenshot using filepath and base64 string.
+  * support parallel execution
+  * assign tags and devices to categorize and identify test cases for each device.
+  * assign authors (for ownership)
+
+* Add the maven dependency to POM.xml
+```xml
+<!-- https://mvnrepository.com/artifact/com.aventstack/extentreports -->
+<dependency>
+    <groupId>com.aventstack</groupId>
+    <artifactId>extentreports</artifactId>
+    <version>5.0.9</version>
+</dependency>
+```
+
+* All methods on ExtentReports are multi-thread safe. The recommended usage is to maintain a single instance of
+  ExtentReports object for your test session.
+* Add the following lines of code in a newly created ExtentReport class. The recommended usage is to maintain a single
+  instance of ExtentReports object for your test session. Therefore, we created a custom synchronized method to check if
+  the instance already exists.
+* Tests are created
+  using [ExtentReports::createTest](https://www.extentreports.com/docs/versions/5/java/index.html#create-tests). The
+  createTest method returns a ExtentTest object which can be used
+  to publish logs, create nodes, assign attributes (tags, devices, authors) or attach screenshots.
+
+```java
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ExtentManager {
+    static ExtentReports extentReports;
+    final static String reportFilePath = "Extent.html";
+    static Map<Long, ExtentTest> extentTestMap = new HashMap<>();
+
+    public synchronized static ExtentReports getReporter() {
+        if (extentReports == null) {
+            ExtentSparkReporter spark = new ExtentSparkReporter(reportFilePath);
+            spark.config().setDocumentTitle("Appium TDD Framework");
+            spark.config().setReportName("Sauce Labs Demo App");
+            spark.config().setTheme(Theme.DARK);
+            extentReports = new ExtentReports();
+            extentReports.attachReporter(spark);
+        }
+        return extentReports;
+    }
+
+    public static ExtentTest getTest() {
+        return extentTestMap.get(Thread.currentThread().getId());
+    }
+
+    public static synchronized ExtentTest startTest(String testName, String desc) {
+        ExtentTest extentTest = getReporter().createTest(testName, desc);
+        extentTestMap.put(Thread.currentThread().getId(), extentTest);
+        return extentTest;
+    }
+
+}
+```
+
+* We will call these methods from the iTestListener.
+* [Extent Report Logging](https://www.extentreports.com/docs/versions/5/java/index.html#logging)
+* It is possible to create log with text details, Exception/Throwable, ScreenCapture or custom Markup using MarkupHelper.
+* After all the test method are executed, we need to flush the reporter which basically writes all the information to report.
+* The line `extent.flush()` instructs ExtentReports write the test information to a destination.
+
+```java
+import com.aventstack.extentreports.Status;
+
+public class TestListener implements ITestListener {
+  TestUtils testUtils = new TestUtils();
+
+  @Override
+  public void onStart(ITestContext context) {
+    ITestListener.super.onStart(context);
+  }
+
+  @Override
+  public void onFinish(ITestContext context) {
+    ExtentManager.getReporter().flush();
+  }
+
+  @Override
+  public void onTestStart(ITestResult result) {
+    ITestListener.super.onTestStart(result);
+  }
+
+  @Override
+  public void onTestSuccess(ITestResult result) {
+    ExtentManager.getTest().log(Status.PASS, "Test Passed");
+  }
+
+  @Override
+  public void onTestSkipped(ITestResult result) {
+    ExtentManager.getTest().log(Status.SKIP, "Test Skipped");
+  }
+
+  @Override
+  public void onTestFailure(ITestResult result) {
+      //code to capture and attach screenshot
+    ExtentManager.getTest().log(Status.FAIL,"Test Failed");
+  }
+}
+```
+
+* In the BaseTest class, add the code to start the extent report. Here we will leverage the java.lang.reflect.Method
+  instead of TestNG ITestResult to get the method name and description.
+* We called this method in BaseTest Class, because we are setting the platform and deviceName in the BeforeTest method
+  in this class, so these variables are not available in the listener onTestStart method because it executes first.
+
+```java
+@BeforeMethod
+    public void beforeMethodBase(Method method) {
+        ExtentManager.startTest(method.getName(), method.getAnnotation(Test.class).description())
+                .assignCategory(getPlatform() + "_" + getDevice())
+                .assignAuthor("itkhanz")
+                ;
+
+        //testUtils.log().info(".....super before method.....");
+        ((CanRecordScreen) getDriver()).startRecordingScreen();
+    }
+```
+
+* The `Extent.html` report will be generated at the root location
+
+<img src="doc/extent-basic-report.png" width="1200">
+
+* Ideally test case logging should only be to get the UI actions or any validations.
+* We can put the extent report logging statements inside the page objects to avoid putting them all over in test methods
+  repeatedly.
+* The methods in page objects already contain logging statements for log4j, so to avoid the duplication, we will put
+  these logging statements in our generic action methods.
+* We overloaded the action methods to accept the message string as additional argument.
+* [System Info](https://www.extentreports.com/docs/versions/5/java/index.html#system-info) allows to add system or environment info for your using using the setSystemInfo method. This automatically adds system information to all started reporters.
+* [how to get property value from pom.xml?](https://stackoverflow.com/a/52465584/7673215)
+* [Retrieve version from maven pom.xml in code](https://stackoverflow.com/a/3697482/7673215)
+* [maven resource plugin](https://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html)
+* we defined the `project.properties` at class path `src/main/resources`:
+```properties
+java-version=${java.release.version}
+appium-version=${appium-java-client-version}
+testng-version=${testng.version}
+extentreports-version=${extentreports.version}
+owner=itkhanz
+```
+* and enabled the resouece filtering in pom.xml:
+```xml
+<build>
+  <resources>
+    <resource>
+      <directory>src/main/resources</directory>
+      <filtering>true</filtering>
+    </resource>
+  </resources>   
+</build>
+```
+* and in the code inside BaseTest class in beforesuite method:
+```java
+        ExtentManager.getReporter().setSystemInfo("OS", System.getProperty("os.name"));
+        Properties projectProps = new Properties();
+        try {
+            projectProps.load(getClass().getClassLoader().getResourceAsStream("project.properties"));
+            ExtentManager.getReporter().setSystemInfo("JDK", projectProps.getProperty("java-version"));
+            ExtentManager.getReporter().setSystemInfo("Appium", projectProps.getProperty("appium-version"));
+            ExtentManager.getReporter().setSystemInfo("TestNG", projectProps.getProperty("testng-version"));
+            ExtentManager.getReporter().setSystemInfo("ExtentReport", projectProps.getProperty("extentreports-version"));
+            ExtentManager.getReporter().setSystemInfo("owner", projectProps.getProperty("owner"));
+        } catch (IOException e) {
+            testUtils.log().info("failed to load project.properties");
+        }
+```
+
+* This outputs the environment variables in report dashboard as:
+
+<img src="doc/extent-environment.png">
+
+* 
+
+
+
+
+
+
+
+

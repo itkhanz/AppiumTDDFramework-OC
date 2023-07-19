@@ -19,6 +19,7 @@
         <log4j-core.version>2.20.0</log4j-core.version>
         <log4j-api.version>2.20.0</log4j-api.version>
         <log4j-slf4j2.version>2.20.0</log4j-slf4j2.version>
+        <extentreports.version>5.0.9</extentreports.version>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <java.release.version>17</java.release.version>
         <maven.surefire.version>3.1.2</maven.surefire.version>
@@ -76,9 +77,23 @@
             <version>${log4j-slf4j2.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.aventstack/extentreports -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>
