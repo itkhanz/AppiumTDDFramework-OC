@@ -314,10 +314,12 @@ public class BaseTest {
 
     @BeforeMethod
     public void beforeMethodBase(Method method) {
-        ExtentManager.startTest(method.getName(), method.getAnnotation(Test.class).description())
+        //If the listener executes first then you may get null exception because platform and device is null at the time of method call
+        //To work around, we can call the ExtentManager.startTest() in the BaseTest Class.
+        /*ExtentManager.startTest(method.getName(), method.getAnnotation(Test.class).description())
                 .assignCategory(getPlatform() + "_" + getDevice())
                 .assignAuthor("itkhanz")
-                ;
+                ;*/
 
         //testUtils.log().info(".....super before method.....");
         ((CanRecordScreen) getDriver()).startRecordingScreen();

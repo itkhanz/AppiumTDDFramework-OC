@@ -12,6 +12,7 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +38,12 @@ public class TestListener implements ITestListener {
 
     @Override
     public void onTestStart(ITestResult result) {
-        ITestListener.super.onTestStart(result);
+        //ITestListener.super.onTestStart(result);
+        BaseTest base = new BaseTest();
+        ExtentManager.startTest(result.getName(),result.getMethod().getDescription())
+                .assignCategory(base.getPlatform() + "_" + base.getDevice())
+                .assignAuthor("itkhanz")
+        ;
     }
 
     @Override
