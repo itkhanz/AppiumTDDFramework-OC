@@ -2,6 +2,7 @@ package com.itkhanz;
 
 import com.aventstack.extentreports.Status;
 import com.itkhanz.constants.Constants;
+import com.itkhanz.pages.safari.SafariPage;
 import com.itkhanz.reports.ExtentManager;
 import com.itkhanz.utils.TestUtils;
 import com.itkhanz.utils.XMLUtils;
@@ -256,6 +257,7 @@ public class BaseTest {
                                 //.setApp(appURL) //not needed when app is pre-installed
                                 .setAppWaitActivity(getProps().getProperty("androidAppWaitActivity"))    //wait for the main activity to start, must use it when using appurl instead of appPackage and appActivity
                                 .setAppWaitDuration(Duration.ofSeconds(30))
+                                .setUiautomator2ServerLaunchTimeout(Duration.ofSeconds(60))
                                 .setSystemPort(Integer.parseInt(systemPort))
                                 .setChromedriverPort(Integer.parseInt(chromeDriverPort))
                                 ;
@@ -316,10 +318,10 @@ public class BaseTest {
     public void beforeMethodBase(Method method) {
         //If the listener executes first then you may get null exception because platform and device is null at the time of method call
         //To work around, we can call the ExtentManager.startTest() in the BaseTest Class.
-        /*ExtentManager.startTest(method.getName(), method.getAnnotation(Test.class).description())
+        ExtentManager.startTest(method.getName(), method.getAnnotation(Test.class).description())
                 .assignCategory(getPlatform() + "_" + getDevice())
                 .assignAuthor("itkhanz")
-                ;*/
+                ;
 
         //testUtils.log().info(".....super before method.....");
         ((CanRecordScreen) getDriver()).startRecordingScreen();
@@ -453,6 +455,27 @@ public class BaseTest {
             }
         };
         return txt;
+    }
+
+    //TODO Move Deeplink related methods to separate class
+    public void openAppWith(String url) {
+        //String platform = getDriver().getCapabilities().getCapability("platformName").toString().toLowerCase();
+        testUtils.log().info("Navigating to Products Overview through deep link: " + url);
+        ExtentManager.getTest().log(Status.INFO, "Navigating to Products Overview through deep link: " + url);
+        switch (getPlatform().toLowerCase()) {
+            case "android" -> {
+                HashMap<String, String> deepUrl = new HashMap<>();
+                deepUrl.put("url", url);
+                deepUrl.put("package", getProps().getProperty("androidAppPackage"));
+                testUtils.log().info("Executing command mobile: deepLink with " + url);
+                getDriver().executeScript("mobile: deepLink", deepUrl);
+            }
+            case "ios" -> {
+                new SafariPage().openAppWithDeepLink(url);
+            }
+            default -> throw new RuntimeException("Inavalid Platform: " + platform);
+        }
+
     }
 
 

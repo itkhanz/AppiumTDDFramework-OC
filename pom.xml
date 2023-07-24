@@ -84,7 +84,6 @@
             <version>${extentreports.version}</version>
         </dependency>
 
-
     </dependencies>
 
     <build>

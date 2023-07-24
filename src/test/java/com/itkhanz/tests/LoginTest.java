@@ -2,8 +2,8 @@ package com.itkhanz.tests;
 
 import com.itkhanz.BaseTest;
 import com.itkhanz.constants.Constants;
-import com.itkhanz.pages.LoginPage;
-import com.itkhanz.pages.ProductsPage;
+import com.itkhanz.pages.saucelabs.LoginPage;
+import com.itkhanz.pages.saucelabs.ProductsPage;
 import com.itkhanz.utils.TestUtils;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -47,13 +47,13 @@ public class LoginTest extends BaseTest {
         //testUtils.log().info(".....LoginTest before method.....");
         closeApp();
         launchApp();
-        testUtils.log().info("****** starting test:" + m.getName() + "******");
+        testUtils.log().info("****** Starting test:" + m.getName() + " ******");
         loginPage = new LoginPage();
     }
 
     @AfterMethod()
-    public void afterMethod(){
-        testUtils.log().info(".....LoginTest after method.....");
+    public void afterMethod(Method m){
+        testUtils.log().info("****** Ending test:" + m.getName() + " ******");
     }
 
     @Test (description = "This tests validates the failed login attempt with invalid username")

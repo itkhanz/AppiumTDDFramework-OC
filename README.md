@@ -1271,8 +1271,30 @@ test.fail(MediaEntityBuilder.createScreenCaptureFromBase64String("base64").build
 
 <img src="doc/extent-screenshot.png" width="1300">
 
+---
 
+## Deep Links
 
+* [https://www.headspin.io/blog/speeding-up-tests-with-deep-links](https://www.headspin.io/blog/speeding-up-tests-with-deep-links)
+* [Reliably Opening Deep Links Across Platforms and Devices](https://www.headspin.io/blog/reliably-opening-deep-links-across-platforms-and-devices)
+* Since we need to be on the login page in each test case, and we are executing tests from the same driver session.
+  Therefore we are performing logout after each test, so the next test starts from the login screen. This is an extra
+  step that slows down the automation.
+* If the logout step fails due to same reason, then the next tests automatically fail causing flakiness.
+* Alternative is to call terminate app and activate app operations before each method but this will also cause significant overhead.
+* The intent of the test is to perform specific validations on page, and the setup steps to login and navigate to that
+  page are unnecessary overhead conflicting with the intent of test case.
+* This problem can be solved by deep links which enable us to navigate and perform certain actions without UI actions.
+* [Sauce Labs Sample App Deep linking](https://github.com/saucelabs/sample-app-mobile#deep-linking)
+  * On Android, running following command will open the checkout screen with 2 products in cart:
+    * `adb shell am start -W -a android.intent.action.VIEW -d "swaglabs://checkout-overview/1,2"`
+    * We do not have access to the adb commands during cloud execution because of the security issues.
+  * On iOS, we can run the following command, and accept the alert to open the products overview page with 2 products already in the cart:
+    * `xcrun simctl openurl booted swaglabs://swag-overview/0,1`
+  * We can also open the safari and type the following:
+    * `swaglabs://swag-overview/0,1`
+
+* [Android Deep linking](https://github.com/appium/appium-uiautomator2-driver#mobile-deeplink)
 
 
 

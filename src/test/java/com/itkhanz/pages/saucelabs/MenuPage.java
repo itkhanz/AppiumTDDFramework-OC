@@ -1,4 +1,4 @@
-package com.itkhanz.pages;
+package com.itkhanz.pages.saucelabs;
 
 import com.itkhanz.BaseTest;
 import com.itkhanz.utils.TestUtils;

@@ -38,12 +38,13 @@ public class TestListener implements ITestListener {
 
     @Override
     public void onTestStart(ITestResult result) {
+        //This method is called from the BaseTest @BeforeMethod now
         //ITestListener.super.onTestStart(result);
-        BaseTest base = new BaseTest();
+        /*BaseTest base = new BaseTest();
         ExtentManager.startTest(result.getName(),result.getMethod().getDescription())
                 .assignCategory(base.getPlatform() + "_" + base.getDevice())
                 .assignAuthor("itkhanz")
-        ;
+        ;*/
     }
 
     @Override

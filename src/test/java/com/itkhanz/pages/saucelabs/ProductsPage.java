@@ -1,6 +1,5 @@
-package com.itkhanz.pages;
+package com.itkhanz.pages.saucelabs;
 
-import com.itkhanz.BaseTest;
 import com.itkhanz.utils.TestUtils;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;

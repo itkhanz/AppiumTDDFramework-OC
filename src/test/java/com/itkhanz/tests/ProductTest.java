@@ -2,21 +2,19 @@ package com.itkhanz.tests;
 
 import com.itkhanz.BaseTest;
 import com.itkhanz.constants.Constants;
-import com.itkhanz.pages.LoginPage;
-import com.itkhanz.pages.ProductDetailsPage;
-import com.itkhanz.pages.ProductsPage;
-import com.itkhanz.pages.SettingsPage;
+import com.itkhanz.pages.saucelabs.LoginPage;
+import com.itkhanz.pages.saucelabs.ProductDetailsPage;
+import com.itkhanz.pages.saucelabs.ProductsPage;
+import com.itkhanz.pages.saucelabs.SettingsPage;
 import com.itkhanz.utils.TestUtils;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import javax.swing.plaf.PanelUI;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
@@ -51,21 +49,23 @@ public class ProductTest extends BaseTest {
     @BeforeMethod
     public void beforeMethod(Method m) {
         //testUtils.log().info(".....ProductTest before method.....");
-        closeApp();
-        launchApp();
-        testUtils.log().info("****** starting test:" + m.getName() + "******");
-        loginPage = new LoginPage();
+        //closeApp();
+        //launchApp();
+        testUtils.log().info("****** Starting test:" + m.getName() + " ******");
+        openAppWith("swaglabs://swag-overview/0,5");
+        productsPage = new ProductsPage();
+        /*loginPage = new LoginPage();
         productsPage = loginPage.login(
                 loginUsersObject.getJSONObject("validUser").getString("username"),
                 loginUsersObject.getJSONObject("validUser").getString("password")
-        );
+        );*/
     }
 
     @AfterMethod
-    public void afterMethod() {
-        testUtils.log().info(".....ProductTest after method.....");
-        settingsPage = productsPage.pressSettingsBtn(); //open the sidebar
-        loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
+    public void afterMethod(Method m) {
+        //settingsPage = productsPage.pressSettingsBtn(); //open the sidebar
+        //loginPage = settingsPage.pressLogoutBtn();  //click on logout button in sidebar
+        testUtils.log().info("****** Ending test:" + m.getName() + " ******");
     }
 
     @Test (description = "Validate the Sauce Labs Backpack title and price on HomePage")

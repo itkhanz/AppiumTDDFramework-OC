@@ -14,11 +14,11 @@
         <parameter name="chromeDriverPort" value="11000" />
         <classes>
             <class name="com.itkhanz.tests.LoginTest">
-                <methods>
+                <!--<methods>
                     <include name="invalidUsernameTest" />
-                </methods>
+                </methods>-->
             </class>
-            <!--<class name="com.itkhanz.tests.ProductTest"/>-->
+            <class name="com.itkhanz.tests.ProductTest"/>
         </classes>
     </test> <!-- Test -->
 
@@ -29,11 +29,11 @@
         <parameter name="wdaLocalPort" value="8100" />
         <classes>
             <class name="com.itkhanz.tests.LoginTest">
-                <methods>
+                <!--<methods>
                     <include name="invalidUsernameTest" />
-                </methods>
+                </methods>-->
             </class>
-            <!--<class name="com.itkhanz.tests.ProductTest"/>-->
+            <class name="com.itkhanz.tests.ProductTest"/>
         </classes>
     </test> <!-- Test -->
 </suite> <!-- Suite -->
