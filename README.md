@@ -8,6 +8,43 @@ This repo contains the source code for Appium Java TDD Framework designed during
 
 ---
 
+## Contents
+
+- [Appium TDD Framework](#appium-tdd-framework)
+  * [Libraries and Tools](#libraries-and-tools)
+  * [Pre-requisites](#pre-requisites)
+  * [Course Notes](#course-notes)
+    + [Part 1 - Automate Test Cases using TestNG and go through Bad Practices](#part-1---automate-test-cases-using-testng-and-go-through-bad-practices)
+    + [Part 2 - Implement Page Object Model (POM) design](#part-2---implement-page-object-model--pom--design)
+    + [Part 3 - Alternate Design | Abstract Test Data & Static Text | Exception Handling](#part-3---alternate-design---abstract-test-data---static-text---exception-handling)
+      - [Alternate Design (no Inheritance)](#alternate-design--no-inheritance-)
+      - [Exception Handling (Try/Catch, TestNG Listener)](#exception-handling--try-catch--testng-listener-)
+      - [Add Abstraction Layer for Test Data](#add-abstraction-layer-for-test-data)
+      - [Add Abstraction Layer for Static Text](#add-abstraction-layer-for-static-text)
+    + [Part 4 - Support iOS Platform](#part-4---support-ios-platform)
+      - [speed-up iOS Tests](#speed-up-ios-tests)
+    + [Part 5 - Add more test cases | Define common elements | Write independent tests](#part-5---add-more-test-cases---define-common-elements---write-independent-tests)
+      - [Define Common Elements](#define-common-elements)
+      - [Failure recovery / Fail safe test cases](#failure-recovery---fail-safe-test-cases)
+    + [Scrolling - UIAutomator2 | Mobile Scroll](#scrolling---uiautomator2---mobile-scroll)
+      - [Android Scroll](#android-scroll)
+      - [iOS Scroll](#ios-scroll)
+    + [Capture Screenshots](#capture-screenshots)
+      - [Capture screenshot for failed test case using TestNG listener.](#capture-screenshot-for-failed-test-case-using-testng-listener)
+      - [Add screenshot to TestNG report HTML](#add-screenshot-to-testng-report-html)
+    + [Record Videos](#record-videos)
+    + [Parallel Execution using Real Android and iOS devices](#parallel-execution-using-real-android-and-ios-devices)
+    + [Log4j2 Logging framework integration](#log4j2-logging-framework-integration)
+    + [Log4j2 - Logging in multi-threaded environment (parallel execution)](#log4j2---logging-in-multi-threaded-environment--parallel-execution-)
+      - [Use SLF4J with Log4J2](#use-slf4j-with-log4j2)
+    + [Start Appium server programmatically](#start-appium-server-programmatically)
+    + [Extent Reports integration](#extent-reports-integration)
+  * [Deep Links](#deep-links)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+---
+
 ## Libraries and Tools
 
 * Maven 3.9.2
