@@ -75,6 +75,7 @@ This repo contains the source code for Appium Java TDD Framework designed during
 * Install XCode and setup Simulator (only for MAC)
 * Configure Path variables as per your OS
 * Verify the setup with appium-doctor
+* Configure path to System variables and executables for appium server in BaseTest `getAppiumService()` and `getEnvironmentMapForAppiumServer()`
 * Configure global properties in config.properties in src/test/resources
 * configure device specific parameters in testng.xml
 * Run tests with testng.xml
@@ -1333,8 +1334,19 @@ test.fail(MediaEntityBuilder.createScreenCaptureFromBase64String("base64").build
 
 * [Android Deep linking](https://github.com/appium/appium-uiautomator2-driver#mobile-deeplink)
 
+---
 
+## CI/CD with Jenkins
 
+* Create separate suite for android and iOS.
+* Run tests with:
+  * `mvn clean test -D"testSuite=android.xml"`
+  * `mvn clean test -D"testSuite=ios.xml"`
+* If you get lombok related error, make sure you have enabled the annotation processing and then add the latest lombok
+  version into your project.
+  `[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile (default-testCompile) on project AppiumTDDFramework-OC: Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x1152900) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x1152900 -> [Help 1]
+  `
+* 
 
 
 

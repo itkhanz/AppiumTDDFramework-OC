@@ -157,6 +157,7 @@ public class BaseTest {
         return isAppiumServerRunning;
     }
 
+    //This method will only work for MAC, because the path to Appium server executable and node are for MACOS
     protected AppiumDriverLocalService getAppiumService(String appiumLogsFolder) {
 
         //comment this line if you are running tests through maven surefire plugin

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Android Test Suite" parallel="tests" thread-count="2" configfailurepolicy="continue">
+    <listeners>
+        <listener class-name="com.itkhanz.listeners.TestListener" />
+    </listeners>
+
+    <test name="Pixel_5">
+        <parameter name="platformName" value="Android" />
+        <parameter name="deviceName" value="Pixel_5" />
+        <parameter name="udid" value="emulator-5554" />
+        <parameter name="emulator" value="true" />
+        <parameter name="systemPort" value="10000" />
+        <parameter name="chromeDriverPort" value="11000" />
+        <classes>
+            <class name="com.itkhanz.tests.LoginTest">
+                <!--<methods>
+                    <include name="invalidUsernameTest" />
+                </methods>-->
+            </class>
+            <class name="com.itkhanz.tests.ProductTest"/>
+        </classes>
+    </test> <!-- Test -->
+
+</suite> <!-- Suite -->
