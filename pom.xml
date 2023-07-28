@@ -23,7 +23,7 @@
         <lombok.version>1.18.28</lombok.version>
         <java.release.version>17</java.release.version>
         <maven.surefire.version>3.1.2</maven.surefire.version>
-        <testSuite>${testSuite}</testSuite>
+        <!--<testSuite>${testSuite}</testSuite>-->
     </properties>
 
     <dependencies>
@@ -110,7 +110,9 @@
                     <version>${maven.surefire.version}</version>
                     <configuration>
                         <suiteXmlFiles>
-                            <suiteXmlFile>${testSuite}</suiteXmlFile>
+                            <!--<suiteXmlFile>${testSuite}</suiteXmlFile>-->
+                            <suiteXmlFile>android.xml</suiteXmlFile>
+                            <suiteXmlFile>ios.xml</suiteXmlFile>
                         </suiteXmlFiles>
                     </configuration>
                 </plugin>

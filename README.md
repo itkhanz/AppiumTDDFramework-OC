@@ -1339,13 +1339,64 @@ test.fail(MediaEntityBuilder.createScreenCaptureFromBase64String("base64").build
 ## CI/CD with Jenkins
 
 * Create separate suite for android and iOS.
+* Add variable for test suite in pom.xml:
+```xml
+<properties>
+  <maven.surefire.version>3.1.2</maven.surefire.version>
+  <testSuite>${testSuite}</testSuite>
+</properties>
+
+<build>
+  <pluginManagement>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <version>${maven.surefire.version}</version>
+              <configuration>
+                  <suiteXmlFiles>
+                      <suiteXmlFile>${testSuite}</suiteXmlFile>
+                  </suiteXmlFiles>
+              </configuration>
+          </plugin>
+      </plugins>
+  </pluginManagement>
+</build>
+```
 * Run tests with:
   * `mvn clean test -D"testSuite=android.xml"`
   * `mvn clean test -D"testSuite=ios.xml"`
+  
+* Or you can add both suiteXmLFiles as:
+```xml
+<pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.version}</version>
+                    <configuration>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>android.xml</suiteXmlFile>
+                            <suiteXmlFile>ios.xml</suiteXmlFile>
+                        </suiteXmlFiles>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+```
+* and then run tests with:
+  * `mvn clean test` for both iOS and Android
+  * `mvn clean test -D"surefire.suiteXmlFiles=android.xml"`
+  * `mvn clean test -D"surefire.suiteXmlFiles=ios.xml"`
 * If you get lombok related error, make sure you have enabled the annotation processing and then add the latest lombok
   version into your project.
   `[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile (default-testCompile) on project AppiumTDDFramework-OC: Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x1152900) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x1152900 -> [Help 1]
   `
+* Fork and Clone the Sauce Labs Demo App https://github.com/saucelabs/sample-app-mobile
+  * We are forking and cloning the repository so that we can pull the latest app code to jenkins and do the commits as
+    well. We are doing this to mimic the build generation process as much as possible by avoiding the complex process of
+    building the app.
 * 
 
 
