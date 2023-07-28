@@ -11,35 +11,38 @@ This repo contains the source code for Appium Java TDD Framework designed during
 ## Contents
 
 - [Appium TDD Framework](#appium-tdd-framework)
-  * [Libraries and Tools](#libraries-and-tools)
-  * [Pre-requisites](#pre-requisites)
-  * [Course Notes](#course-notes)
-    + [Part 1 - Automate Test Cases using TestNG and go through Bad Practices](#part-1---automate-test-cases-using-testng-and-go-through-bad-practices)
-    + [Part 2 - Implement Page Object Model (POM) design](#part-2---implement-page-object-model--pom--design)
-    + [Part 3 - Alternate Design | Abstract Test Data & Static Text | Exception Handling](#part-3---alternate-design---abstract-test-data---static-text---exception-handling)
-      - [Alternate Design (no Inheritance)](#alternate-design--no-inheritance-)
-      - [Exception Handling (Try/Catch, TestNG Listener)](#exception-handling--try-catch--testng-listener-)
-      - [Add Abstraction Layer for Test Data](#add-abstraction-layer-for-test-data)
-      - [Add Abstraction Layer for Static Text](#add-abstraction-layer-for-static-text)
-    + [Part 4 - Support iOS Platform](#part-4---support-ios-platform)
-      - [speed-up iOS Tests](#speed-up-ios-tests)
-    + [Part 5 - Add more test cases | Define common elements | Write independent tests](#part-5---add-more-test-cases---define-common-elements---write-independent-tests)
-      - [Define Common Elements](#define-common-elements)
-      - [Failure recovery / Fail safe test cases](#failure-recovery---fail-safe-test-cases)
-    + [Scrolling - UIAutomator2 | Mobile Scroll](#scrolling---uiautomator2---mobile-scroll)
-      - [Android Scroll](#android-scroll)
-      - [iOS Scroll](#ios-scroll)
-    + [Capture Screenshots](#capture-screenshots)
-      - [Capture screenshot for failed test case using TestNG listener.](#capture-screenshot-for-failed-test-case-using-testng-listener)
-      - [Add screenshot to TestNG report HTML](#add-screenshot-to-testng-report-html)
-    + [Record Videos](#record-videos)
-    + [Parallel Execution using Real Android and iOS devices](#parallel-execution-using-real-android-and-ios-devices)
-    + [Log4j2 Logging framework integration](#log4j2-logging-framework-integration)
-    + [Log4j2 - Logging in multi-threaded environment (parallel execution)](#log4j2---logging-in-multi-threaded-environment--parallel-execution-)
-      - [Use SLF4J with Log4J2](#use-slf4j-with-log4j2)
-    + [Start Appium server programmatically](#start-appium-server-programmatically)
-    + [Extent Reports integration](#extent-reports-integration)
-  * [Deep Links](#deep-links)
+- [Libraries and Tools](#libraries-and-tools)
+- [Pre-requisites](#pre-requisites)
+- [Course Notes](#course-notes)
+  * [Part 1 - Automate Test Cases using TestNG and go through Bad Practices](#part-1---automate-test-cases-using-testng-and-go-through-bad-practices)
+  * [Part 2 - Implement Page Object Model (POM) design](#part-2---implement-page-object-model--pom--design)
+  * [Part 3 - Alternate Design | Abstract Test Data & Static Text | Exception Handling](#part-3---alternate-design---abstract-test-data---static-text---exception-handling)
+    + [Alternate Design (no Inheritance)](#alternate-design--no-inheritance-)
+    + [Exception Handling (Try/Catch, TestNG Listener)](#exception-handling--try-catch--testng-listener-)
+    + [Add Abstraction Layer for Test Data](#add-abstraction-layer-for-test-data)
+    + [Add Abstraction Layer for Static Text](#add-abstraction-layer-for-static-text)
+  * [Part 4 - Support iOS Platform](#part-4---support-ios-platform)
+    + [speed-up iOS Tests](#speed-up-ios-tests)
+  * [Part 5 - Add more test cases | Define common elements | Write independent tests](#part-5---add-more-test-cases---define-common-elements---write-independent-tests)
+    + [Define Common Elements](#define-common-elements)
+    + [Failure recovery / Fail safe test cases](#failure-recovery---fail-safe-test-cases)
+  * [Scrolling - UIAutomator2 | Mobile Scroll](#scrolling---uiautomator2---mobile-scroll)
+    + [Android Scroll](#android-scroll)
+    + [iOS Scroll](#ios-scroll)
+  * [Capture Screenshots](#capture-screenshots)
+    + [Capture screenshot for failed test case using TestNG listener.](#capture-screenshot-for-failed-test-case-using-testng-listener)
+    + [Add screenshot to TestNG report HTML](#add-screenshot-to-testng-report-html)
+  * [Record Videos](#record-videos)
+  * [Parallel Execution using Real Android and iOS devices](#parallel-execution-using-real-android-and-ios-devices)
+  * [Log4j2 Logging framework integration](#log4j2-logging-framework-integration)
+  * [Log4j2 - Logging in multi-threaded environment (parallel execution)](#log4j2---logging-in-multi-threaded-environment--parallel-execution-)
+    + [Use SLF4J with Log4J2](#use-slf4j-with-log4j2)
+  * [Start Appium server programmatically](#start-appium-server-programmatically)
+  * [Extent Reports integration](#extent-reports-integration)
+- [Deep Links](#deep-links)
+- [CI/CD with Jenkins](#ci-cd-with-jenkins)
+  * [Mac: Install and Configure Jenkins](#mac--install-and-configure-jenkins)
+  * [Jenkins: Create Android test job](#jenkins--create-android-test-job)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -1397,7 +1400,165 @@ test.fail(MediaEntityBuilder.createScreenCaptureFromBase64String("base64").build
   * We are forking and cloning the repository so that we can pull the latest app code to jenkins and do the commits as
     well. We are doing this to mimic the build generation process as much as possible by avoiding the complex process of
     building the app.
-* 
 
+### Mac: Install and Configure Jenkins
 
+* [macOS Installers for Jenkins LTS](https://www.jenkins.io/download/lts/macos/)
+* Install the latest LTS version: `brew install jenkins-lts`
+* Start the Jenkins service: `brew services start jenkins-lts`
+* Stop the Jenkins service: `brew services stop jenkins-lts`
+* Restart the Jenkins service: `brew services restart jenkins-lts`
+* Launch http://localhost:8080
+* Unlock Jenkins:
+  * Admin Password: /Users/****/.jenkins/secrets/initialAdminPassword
+* Install the suggested plugins
+* Create First Admin User and login
+* Specify the Jenkins URL e.g. `http://localhost:8080/`
 
+### Jenkins: Create Android test job
+
+* create a freestyle job and add Git repo and branch
+* Choose the `Build Step` and `Execute Shell` command:
+* The path to maven should be same as in your system.
+```shell
+#!/bin/zsh -l
+export MAVEN_HOME=/Library/Maven/apache-maven-3.9.2
+export PATH=$PATH:$MAVEN_HOME/bin
+mvn --version
+mvn clean test -D"surefire.suiteXmlFiles=android.xml"
+```
+* This will run tests provided that the emulator is already running on System.
+
+* [Jenkins Maven Configuration](https://toolsqa.com/jenkins/jenkins-maven/)
+* Also install following plugins:
+  * [TestNG Results](https://plugins.jenkins.io/testng-plugin/)
+  * [HTML Publisher](https://plugins.jenkins.io/htmlpublisher/)
+  * [Email Extension](https://plugins.jenkins.io/email-ext/)
+  * [Email Extension Template](https://plugins.jenkins.io/emailext-template/)
+* Alternatively, you can configure the JAVA_HOME and MAVEN_HOME as specified in the steps in above link.
+* We will also publish the TestNG reports with [TestNG Results Plugin](https://www.lambdatest.com/blog/how-to-generate-testng-reports-in-jenkins/)
+* Create a new Maven Project:
+  * Choose `This project is parameterized` and add parameters for platfom suites
+  * Add Git repo, credentials, and branch.
+  * Specify the Goal in Build `clean test -Dsurefire.suiteXmlFiles="$platform".xml`
+  * [How To Generate TestNG Reports In Jenkins?](https://www.lambdatest.com/blog/how-to-generate-testng-reports-in-jenkins/)
+  * [JENKINS - Publish Extent Report](https://www.youtube.com/watch?v=zn0cLQnaKXY)
+  * [How To Publish ExtentReport Using Jenkins](https://automationqahub.com/how-to-publish-extentreport-using-jenkins/)
+  * In Post-build actions:
+    * choose `Publish TestG Results`, and specify the path to testng-results.html
+    * choose `Publish HTML reports` and specify the path of extent report folder and index page.
+
+* If the Extent Report is broken, [run this script](https://stackoverflow.com/a/51780073/7673215) 
+  * Install [Groovy plugin](https://plugins.jenkins.io/groovy)
+  * Reach to your job --> Configure--> Pre Steps --> Execute it in an "Execute system Groovy Script" build step with this script:-
+  ```groovy
+  System.clearProperty("hudson.model.DirectoryBrowserSupport.CSP");
+  
+  System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox allow-same- origin allow-scripts;default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *; connect-src * 'self' data:; img-src 'self' data:;");
+  ```
+* Install the `Email Extension` and `Email Extension Template Plugin`.
+  * Configure the sender and receiver email
+  * You must use the app password for email and not the regular. APP password must be set both
+    for `Extended E-mail Notification` and ` E-mail Notification`
+  * Email configuration is explained in detail here:
+    * [Framework - Jenkins Email Report] (https://github.com/itkhanz/REST-Assured-API-Testing/tree/main/RESTAssured-OC#framework---jenkins-email-report)
+    * [How to Share TestNG Reports in Jenkins?](https://www.lambdatest.com/blog/how-to-generate-testng-reports-in-jenkins/#Jenkins)
+    * Make sure that the build trigger is set to always in post build actions for email.
+* Following subject was added to the `Default Content section` in `Editable Email Notification` in Post build actions.
+* To attach the reports, following comma separated files are specified `**/extent.html, **/emailable-report.html`
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+</head>
+<body>
+<h4 style="font-size: 20px" class="value" align="left">${JOB_DESCRIPTION}</h4>
+<div>Build Initiated by: <b>${BUILD_USER}</b></div>
+<div>GIT Branch: <b>${GIT_BRANCH}</b></div>
+<div>Test Platform: <b>${platform}</b></div>
+<div>Tests Summary: <b>${FAILED_TESTS, showStack=false}</b></div>
+<table class="container" align="center" style="padding-top: 20px;">
+    <tr class="center">
+        <td colspan="4">
+            <h2>Appium TDD Automation Test Reports</h2>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table style="background: #67c2ef;width: 120px;">
+                <tr>
+                    <td style="font-size: 36px" class="value" align="center">${TEST_COUNTS, var="total"}</td>
+                </tr>
+                <tr>
+                    <td style="center">Total</td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table style="background: #79c447;width: 120px;">
+                <tr>
+                    <td style="font-size: 36px" class="value" align="center">${TEST_COUNTS, var="pass"}</td>
+                </tr>
+                <tr>
+                    <td style="center">Passed</td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table style="background: #ff5454;width: 120px;">
+                <tr>
+                    <td style="font-size: 36px" class="value" align="center">${TEST_COUNTS, var="fail"}</td>
+                </tr>
+                <tr>
+                    <td style="center">Failed</td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <table style="background: #fabb3d;width: 120px;">
+                <tr>
+                    <td style="font-size: 36px" class="value" align="center">${TEST_COUNTS, var="skip"}</td>
+                </tr>
+                <tr>
+                    <td style="center">Skipped</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<div>Check console output at <a href="$BUILD_URL">BUILD URL</a> to view the results.</div>
+</body>
+</html>
+```
+
+<img src="doc/jenkins-java.png">
+
+<img src="doc/jenkins-maven.png">
+
+<img src="doc/jenkins-parameters.png">
+
+<img src="doc/jenkins-goal.png">
+
+<img src="doc/jenkins-publish-html-report.png">
+
+<img src="doc/jenkins-testng-results.png">
+
+<img src="doc/jenkins-groovy.png">
+
+* After all the configuration, you can now now run the tests on either iOS or Android:
+
+<img src="doc/jenkins-build.png">
+
+<img src="doc/jenkins-build-result.png">
+
+<img src="doc/jenkins-testng-result.png">
+
+<img src="doc/jenkins-extent-dashboard.png">
+
+<img src="doc/jenkins-extent-tests.png">
+
+<img src="doc/jenkins-email.png">
