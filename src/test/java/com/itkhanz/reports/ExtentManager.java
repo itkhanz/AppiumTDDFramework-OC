@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ExtentManager {
     static ExtentReports extentReports;
-    final static String reportFilePath = "target" + File.separator + "extent.html";
+    final static String reportFilePath = "test-report" + File.separator + "extent" + File.separator + "extent.html";
     static Map<Long, ExtentTest> extentTestMap = new HashMap<>();
 
     public synchronized static ExtentReports getReporter() {
