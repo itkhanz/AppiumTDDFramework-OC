@@ -1567,6 +1567,10 @@ mvn clean test -D"surefire.suiteXmlFiles=android.xml"
 
 ### Create Jenkins Pipeline Script
 
+* [Jenkins Pipeline](https://www.jenkins.io/doc/book/pipeline/)
+* [What is Jenkins Pipeline | Basic Syntax of Jenkins Pipeline Script with example](https://www.youtube.com/watch?v=ev07GtJyx-s&list=PLlc_LrU50tljcyDeTK9JfVpmPyaigzXua&index=30)
+* [Jenkins Pipeline script example for Maven build | Build Maven with Jenkins Pipeline](https://www.youtube.com/watch?v=bEs13vdZEfk&list=PLlc_LrU50tljcyDeTK9JfVpmPyaigzXua&index=30)
+* [What Is Jenkins Pipeline | Jenkins Pipeline Setup Example With Github | Jenkinsfile For Maven Build](https://www.youtube.com/watch?v=AqITZLJ5eZ4)
 * Instead of creating the Maven Job in Jenkins manually by UI actions in Jenkins, a better approach is to perform these steps in a scripted manner.
 * We can create a `Jenkinsfile` and write the script in it to replicate the above steps as separate build stages.
 * Make sure that you have already set the maven path in jenkins, and the above mentioned plugins installed.
@@ -1589,10 +1593,22 @@ mvn clean test -D"surefire.suiteXmlFiles=android.xml"
 
     * Checks out the git repo from specified url and branch. Make sure to replace the `credentialsId` with your own
       credentials ID. you can create the credentials ID at the time of adding new credentials in jenkins.
-    * Compile Code
-    * Run Tests based on chosen Platform
+    * Compile Code.
+    > for windows, use `bat` instead of `sh`
+    * The commands used in the script (sh 'mvn ...', sh 'zip ...') are standard shell commands and are available in
+      macOS. Jenkins agents on macOS use the default shell, which is usually Bash, just like in most Linux
+      distributions.
+    * Run Tests based on chosen Platform.
+    * To incorporate the user-chosen PLATFORM parameter into the Maven test command in a Jenkins pipeline, you can use
+      string interpolation to inject the selected platform value into the command. 
+    * In the Test stage, we use string interpolation ("`${params.PLATFORM}`") to inject the selected platform value into
+      the Maven test command. The selected platform value is used as the argument for the `surefire.suiteXmlFiles`
+      parameter in the Maven command.
     * Archive the logs folder which contains the Appium Server and platform specific test logs. Choose the location of
       logs folder as per your project.
+    * In this Jenkinsfile, the `Archive Logs` stage is added after the build and test stages. Inside this stage, the logs
+      folder is zipped using the zip command, and the resulting `logs.zip` file is archived as a build artifact using the
+      `archiveArtifacts` step. This allows the zip file to be preserved and accessible for post-build actions.
     * In the post build stages, we will:
       * Publish the TestNG Results. Make sure that your xml results are named by default as `testng-results.xml`
       * Publish the Extent HTML Report to view in Jenkins. Specify the `reportDir` and `reportFiles` according to your
@@ -1600,6 +1616,12 @@ mvn clean test -D"surefire.suiteXmlFiles=android.xml"
       * Send email to after the build is finished which contains the build details, test results, link to view the test
         report directly, link to Jenkins job build. It also attaches the build log, custom appium logs, extent html
         report, and testng html report in email body.
+      * In the email body of the Jenkins pipeline using the `emailext` plugin, you cannot directly access the pipeline
+        parameters using ${params.PARAMETER_NAME}. The `${params.PARAMETER_NAME}` variable substitution is specific to the
+        Jenkins pipeline context, and it won't be available in the email template.
+      * To include the choice parameters declared in the Jenkinsfile script in your email body, you can use the Jenkins
+        environment variables. Jenkins automatically sets environment variables for the parameters with the format
+        `PARAMETER_NAME=value`.
 
 ```groovy
 pipeline {
